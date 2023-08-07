@@ -4,6 +4,7 @@ export default defineConfig({
   plugins: ['arrow-return-style'],
 
   rules: {
+    'arrow-body-style': 'off',
     'arrow-return-style/arrow-return-style': 'warn',
   },
 });
