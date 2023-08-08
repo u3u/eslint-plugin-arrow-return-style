@@ -5,3 +5,12 @@
 🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
 
 <!-- end auto-generated rule header -->
+
+## Options
+
+### `maxLen`
+
+Type: `number`\
+Default: `80`
+
+If the arrow function expression exceeds `maxLen` characters, it is forced to use explicit return.

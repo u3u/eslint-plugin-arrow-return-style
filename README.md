@@ -4,6 +4,15 @@
 
 [![npm version](https://badgen.net/npm/v/eslint-plugin-arrow-return-style)](https://npm.im/eslint-plugin-arrow-return-style) [![npm downloads](https://badgen.net/npm/dm/eslint-plugin-arrow-return-style)](https://npm.im/eslint-plugin-arrow-return-style) [![codecov](https://codecov.io/gh/u3u/eslint-plugin-arrow-return-style/branch/main/graph/badge.svg)](https://codecov.io/gh/u3u/eslint-plugin-arrow-return-style)
 
+## Features
+
+> This rule serves as an alternative to the [`arrow-body-style`](https://eslint.org/docs/latest/rules/arrow-body-style#as-needed) with `as-needed` options, used to improve the style of arrow function return values.
+
+- When arrow function expressions are multiline or exceed a certain length, explicit return should be enforced to improve readability and extensibility.
+- When an arrow function has only one return value (and does not contain any comments), implicit return should be used to simplify the code and improve readability.
+- When using arrow functions as named exports, explicit return should always be used to maintain consistency with regular functions.
+- When using arrow functions as React components, always use explicit return to facilitate the addition of `props` and `hooks` in the future.
+
 ## Install
 
 ```sh
@@ -18,6 +27,15 @@ module.exports = {
   extends: ['plugin:arrow-return-style/recommended'],
 };
 ```
+
+## Options
+
+### `maxLen`
+
+Type: `number`\
+Default: `80`
+
+If the arrow function expression exceeds `maxLen` characters, it is forced to use explicit return.
 
 ## Rules
 
