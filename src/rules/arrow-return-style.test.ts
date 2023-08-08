@@ -170,10 +170,31 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
         /> }
       `,
     },
+
+    {
+      code: dedent`
+        export const createRule = ESLintUtils.RuleCreator(
+          (rule) => \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\`
+        );
+      `,
+
+      errors: [
+        {
+          messageId: 'useExplicitReturn',
+        },
+      ],
+
+      output: dedent`
+        export const createRule = ESLintUtils.RuleCreator(
+          (rule) => { return \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\` }
+        );
+      `,
+    },
   ],
 
   valid: [
     'const t = () => Date.now()',
+    'const fn = () => { return }',
 
     'Array.from({ length: 10 }).map((_, i) => i + 1)',
 

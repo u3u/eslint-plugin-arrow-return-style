@@ -1,24 +1,36 @@
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../utils/create-rule';
 
+type Options = [
+  {
+    maxLen?: number;
+  }
+];
+
+type MessageIds = 'useExplicitReturn' | 'useImplicitReturn';
+
 export const RULE_NAME = 'arrow-return-style';
 
-export const arrowReturnStyleRule = createRule({
+export const arrowReturnStyleRule = createRule<Options, MessageIds>({
   create: (context) => {
     const sourceCode = context.getSourceCode();
 
     return {
       ArrowFunctionExpression: (arrowFunction) => {
         const { body: arrowBody, parent: arrowFunctionParent } = arrowFunction;
+        const { maxLen = 80 } = context.options[0] || {};
 
+        const isMaxLen = (node = arrowBody) => node.loc.end.column - node.loc.start.column >= maxLen;
         const isMultiline = (node = arrowBody) => node.loc.start.line !== node.loc.end.line;
-
-        const isJsxElement = (node = arrowBody) =>
-          node.type === AST_NODE_TYPES.JSXElement || node.type === AST_NODE_TYPES.JSXFragment;
-
         const isObjectLiteral = (node = arrowBody) => node.type === AST_NODE_TYPES.ObjectExpression;
 
-        const isNamedExport = () => arrowFunctionParent.parent?.parent?.type === AST_NODE_TYPES.ExportNamedDeclaration;
+        const isJsxElement = (node = arrowBody) => {
+          return node.type === AST_NODE_TYPES.JSXElement || node.type === AST_NODE_TYPES.JSXFragment;
+        };
+
+        const isNamedExport = () => {
+          return arrowFunctionParent.parent?.parent?.type === AST_NODE_TYPES.ExportNamedDeclaration;
+        };
 
         if (arrowBody.type === AST_NODE_TYPES.BlockStatement) {
           const blockBody = arrowBody.body;
@@ -29,6 +41,7 @@ export const arrowReturnStyleRule = createRule({
 
             if (!returnValue) return;
             if (isNamedExport()) return;
+            if (isMaxLen(returnValue)) return;
             if (isMultiline(returnValue)) return;
             if (isJsxElement(returnValue)) return;
 
@@ -61,7 +74,7 @@ export const arrowReturnStyleRule = createRule({
               node: arrowFunction,
             });
           }
-        } else if (isMultiline() || isJsxElement() || isNamedExport()) {
+        } else if (isMultiline() || isMaxLen() || isJsxElement() || isNamedExport()) {
           context.report({
             fix: (fixer) => {
               const fixes = [];
@@ -86,7 +99,11 @@ export const arrowReturnStyleRule = createRule({
     };
   },
 
-  defaultOptions: [],
+  defaultOptions: [
+    {
+      maxLen: 80,
+    },
+  ],
 
   meta: {
     docs: {
@@ -100,7 +117,17 @@ export const arrowReturnStyleRule = createRule({
       useImplicitReturn: 'Use implicit return for single-line arrow function bodies.',
     },
 
-    schema: [],
+    schema: [
+      {
+        additionalProperties: true,
+
+        properties: {
+          maxLen: { type: 'number' },
+        },
+
+        type: 'object',
+      },
+    ],
 
     type: 'suggestion',
   },
