@@ -1,4 +1,4 @@
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, ASTUtils } from '@typescript-eslint/utils';
 import { createRule } from '../utils/create-rule';
 
 type Options = [
@@ -78,13 +78,16 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
           context.report({
             fix: (fixer) => {
               const fixes = [];
+              const firstToken = sourceCode.getTokenBefore(arrowBody);
+              const lastToken = sourceCode.getTokenAfter(arrowBody);
 
-              if (isObjectLiteral()) {
-                fixes.push(
-                  fixer.remove(sourceCode.getTokenBefore(arrowBody)!),
-                  fixer.remove(sourceCode.getTokenAfter(arrowBody)!)
-                );
-              }
+              if (
+                firstToken &&
+                lastToken &&
+                ASTUtils.isOpeningParenToken(firstToken) &&
+                ASTUtils.isClosingParenToken(lastToken)
+              )
+                fixes.push(fixer.remove(firstToken), fixer.remove(lastToken));
 
               fixes.push(fixer.replaceText(arrowBody, `{ return ${sourceCode.getText(arrowBody)} }`));
 

@@ -190,6 +190,18 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
         );
       `,
     },
+
+    {
+      code: 'const render = () => (<div />)',
+
+      errors: [
+        {
+          messageId: 'useExplicitReturn',
+        },
+      ],
+
+      output: 'const render = () => { return <div /> }',
+    },
   ],
 
   valid: [
