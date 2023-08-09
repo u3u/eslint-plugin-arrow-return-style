@@ -53,9 +53,10 @@ If set `true`, always use explicit return.
 ✅ Set in the `recommended` configuration.\
 🔧 Automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/user-guide/command-line-interface#--fix).
 
-| Name                                                   | Description                         | ⚠️ | 🔧 |
-| :----------------------------------------------------- | :---------------------------------- | :- | :- |
-| [arrow-return-style](docs/rules/arrow-return-style.md) | Enforce arrow function return style | ✅  | 🔧 |
+| Name                                                             | Description                                                                                               | ⚠️ | 🔧 |
+| :--------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------- | :- | :- |
+| [arrow-return-style](docs/rules/arrow-return-style.md)           | Enforce arrow function return style                                                                       | ✅  | 🔧 |
+| [no-export-default-arrow](docs/rules/no-export-default-arrow.md) | Disallow export default anonymous arrow function<br/>_**Automatically fix using the current file name.**_ | ✅  | 🔧 |
 
 <!-- end auto-generated rules list -->
 <!-- prettier-ignore-end -->
