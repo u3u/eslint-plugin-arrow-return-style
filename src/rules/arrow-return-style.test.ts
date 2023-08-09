@@ -106,8 +106,8 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
     {
       code: 'const Div = () => <><div /></>',
       errors: [{ messageId: 'useExplicitReturn' }],
-      output: 'const Div = () => { return <><div /></> }',
       options: [{ jsxAlwaysUseExplicitReturn: true }],
+      output: 'const Div = () => { return <><div /></> }',
     },
 
     {
@@ -155,8 +155,8 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
     {
       code: 'const render = () => (<div />)',
       errors: [{ messageId: 'useExplicitReturn' }],
-      output: 'const render = () => { return <div /> }',
       options: [{ jsxAlwaysUseExplicitReturn: true }],
+      output: 'const render = () => { return <div /> }',
     },
   ],
 

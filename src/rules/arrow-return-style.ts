@@ -3,8 +3,8 @@ import { createRule } from '../utils/create-rule';
 
 type Options = [
   {
-    maxLen?: number;
     jsxAlwaysUseExplicitReturn?: boolean;
+    maxLen?: number;
   }
 ];
 
@@ -19,7 +19,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
     return {
       ArrowFunctionExpression: (arrowFunction) => {
         const { body: arrowBody, parent: arrowFunctionParent } = arrowFunction;
-        const { maxLen = 80, jsxAlwaysUseExplicitReturn } = context.options?.[0] || {};
+        const { jsxAlwaysUseExplicitReturn, maxLen = 80 } = context.options?.[0] || {};
 
         const isMaxLen = (node = arrowBody) => node.loc.end.column - node.loc.start.column >= maxLen;
         const isMultiline = (node = arrowBody) => node.loc.start.line !== node.loc.end.line;
@@ -111,8 +111,8 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
 
   defaultOptions: [
     {
-      maxLen: 80,
       jsxAlwaysUseExplicitReturn: false,
+      maxLen: 80,
     },
   ],
 
@@ -133,8 +133,8 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
         additionalProperties: true,
 
         properties: {
-          maxLen: { type: 'number', default: 80 },
-          jsxAlwaysUseExplicitReturn: { type: 'boolean', default: false },
+          jsxAlwaysUseExplicitReturn: { default: false, type: 'boolean' },
+          maxLen: { default: 80, type: 'number' },
         },
 
         type: 'object',
