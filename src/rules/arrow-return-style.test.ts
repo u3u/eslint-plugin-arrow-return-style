@@ -140,7 +140,7 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
       code: dedent`
         export const createRule = ESLintUtils.RuleCreator(
           (rule) => \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\`
-        );
+        )
       `,
 
       errors: [{ messageId: 'useExplicitReturn' }],
@@ -148,7 +148,7 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
       output: dedent`
         export const createRule = ESLintUtils.RuleCreator(
           (rule) => { return \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\` }
-        );
+        )
       `,
     },
 
@@ -157,6 +157,40 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
       errors: [{ messageId: 'useExplicitReturn' }],
       options: [{ jsxAlwaysUseExplicitReturn: true }],
       output: 'const render = () => { return <div /> }',
+    },
+
+    {
+      code: dedent`
+        const fn = () =>
+          /* block comment */
+          1
+      `,
+
+      errors: [{ messageId: 'useExplicitReturn' }],
+
+      output: dedent`
+        const fn = () => {
+          /* block comment */
+          return 1
+        }
+      `,
+    },
+
+    {
+      code: dedent`
+        const test = () =>
+          // line comment
+          ({ name: 'test' })
+      `,
+
+      errors: [{ messageId: 'useExplicitReturn' }],
+
+      output: dedent`
+        const test = () => {
+          // line comment
+          return { name: 'test' }
+        }
+      `,
     },
   ],
 

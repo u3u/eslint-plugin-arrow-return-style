@@ -33,6 +33,19 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
           return arrowFunctionParent.parent?.parent?.type === AST_NODE_TYPES.ExportNamedDeclaration;
         };
 
+        const getArrowToken = () => {
+          const tokens = sourceCode.getTokens(arrowFunction);
+          const arrowToken = tokens.find(ASTUtils.isArrowToken);
+
+          return arrowToken;
+        };
+
+        const commentsExistBetweenArrowTokenAndArrowBody = () => {
+          const arrowToken = getArrowToken();
+
+          return arrowToken && sourceCode.commentsExistBetween(arrowToken, arrowBody);
+        };
+
         if (arrowBody.type === AST_NODE_TYPES.BlockStatement) {
           const blockBody = arrowBody.body;
 
@@ -75,35 +88,50 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
               node: arrowFunction,
             });
           }
-        } else if (
-          //
-          isMaxLen() ||
-          isMultiline() ||
-          isNamedExport() ||
-          (jsxAlwaysUseExplicitReturn && isJsxElement())
-        ) {
-          context.report({
-            fix: (fixer) => {
-              const fixes = [];
-              const firstToken = sourceCode.getTokenBefore(arrowBody);
-              const lastToken = sourceCode.getTokenAfter(arrowBody);
+        } else {
+          const commentsExist = commentsExistBetweenArrowTokenAndArrowBody();
 
-              if (
-                firstToken &&
-                lastToken &&
-                ASTUtils.isOpeningParenToken(firstToken) &&
-                ASTUtils.isClosingParenToken(lastToken)
-              )
-                fixes.push(fixer.remove(firstToken), fixer.remove(lastToken));
+          if (
+            //
+            commentsExist ||
+            isMaxLen() ||
+            isMultiline() ||
+            isNamedExport() ||
+            (jsxAlwaysUseExplicitReturn && isJsxElement())
+          ) {
+            context.report({
+              fix: (fixer) => {
+                const fixes = [];
+                const firstToken = sourceCode.getTokenBefore(arrowBody);
+                const lastToken = sourceCode.getTokenAfter(arrowBody);
 
-              fixes.push(fixer.replaceText(arrowBody, `{ return ${sourceCode.getText(arrowBody)} }`));
+                if (
+                  firstToken &&
+                  lastToken &&
+                  ASTUtils.isOpeningParenToken(firstToken) &&
+                  ASTUtils.isClosingParenToken(lastToken)
+                )
+                  fixes.push(fixer.remove(firstToken), fixer.remove(lastToken));
 
-              return fixes;
-            },
+                if (commentsExist) {
+                  const arrowToken = getArrowToken()!;
 
-            messageId: 'useExplicitReturn',
-            node: arrowFunction,
-          });
+                  fixes.push(
+                    fixer.insertTextAfter(arrowToken, ' {'),
+                    fixer.insertTextBefore(arrowBody, 'return '),
+                    fixer.insertTextAfter(arrowBody, '\n}')
+                  );
+                } else {
+                  fixes.push(fixer.replaceText(arrowBody, `{ return ${sourceCode.getText(arrowBody)} }`));
+                }
+
+                return fixes;
+              },
+
+              messageId: 'useExplicitReturn',
+              node: arrowFunction,
+            });
+          }
         }
       },
     };
