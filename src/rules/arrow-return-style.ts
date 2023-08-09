@@ -4,6 +4,7 @@ import { createRule } from '../utils/create-rule';
 type Options = [
   {
     maxLen?: number;
+    jsxAlwaysUseExplicitReturn?: boolean;
   }
 ];
 
@@ -18,7 +19,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
     return {
       ArrowFunctionExpression: (arrowFunction) => {
         const { body: arrowBody, parent: arrowFunctionParent } = arrowFunction;
-        const { maxLen = 80 } = context.options[0] || {};
+        const { maxLen = 80, jsxAlwaysUseExplicitReturn } = context.options?.[0] || {};
 
         const isMaxLen = (node = arrowBody) => node.loc.end.column - node.loc.start.column >= maxLen;
         const isMultiline = (node = arrowBody) => node.loc.start.line !== node.loc.end.line;
@@ -43,7 +44,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
             if (isNamedExport()) return;
             if (isMaxLen(returnValue)) return;
             if (isMultiline(returnValue)) return;
-            if (isJsxElement(returnValue)) return;
+            if (jsxAlwaysUseExplicitReturn && isJsxElement(returnValue)) return;
 
             const openingBrace = sourceCode.getFirstToken(arrowBody)!;
             const closingBrace = sourceCode.getLastToken(arrowBody)!;
@@ -74,7 +75,13 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
               node: arrowFunction,
             });
           }
-        } else if (isMultiline() || isMaxLen() || isJsxElement() || isNamedExport()) {
+        } else if (
+          //
+          isMaxLen() ||
+          isMultiline() ||
+          isNamedExport() ||
+          (jsxAlwaysUseExplicitReturn && isJsxElement())
+        ) {
           context.report({
             fix: (fixer) => {
               const fixes = [];
@@ -105,6 +112,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
   defaultOptions: [
     {
       maxLen: 80,
+      jsxAlwaysUseExplicitReturn: false,
     },
   ],
 
@@ -125,7 +133,8 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
         additionalProperties: true,
 
         properties: {
-          maxLen: { type: 'number' },
+          maxLen: { type: 'number', default: 80 },
+          jsxAlwaysUseExplicitReturn: { type: 'boolean', default: false },
         },
 
         type: 'object',

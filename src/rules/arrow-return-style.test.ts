@@ -25,11 +25,7 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
           })
       `,
 
-      errors: [
-        {
-          messageId: 'useExplicitReturn',
-        },
-      ],
+      errors: [{ messageId: 'useExplicitReturn' }],
 
       output: dedent`
         const delay = () =>
@@ -46,11 +42,7 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
         }
       `,
 
-      errors: [
-        {
-          messageId: 'useImplicitReturn',
-        },
-      ],
+      errors: [{ messageId: 'useImplicitReturn' }],
 
       output: dedent`
         const foo = () => 
@@ -65,11 +57,7 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
         })
       `,
 
-      errors: [
-        {
-          messageId: 'useImplicitReturn',
-        },
-      ],
+      errors: [{ messageId: 'useImplicitReturn' }],
 
       output: dedent`
         Array.from({ length: 10 }).map((_, i) => 
@@ -85,11 +73,7 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
         }
       `,
 
-      errors: [
-        {
-          messageId: 'useImplicitReturn',
-        },
-      ],
+      errors: [{ messageId: 'useImplicitReturn' }],
 
       output: dedent`
         const obj = () => 
@@ -104,11 +88,7 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
         })
       `,
 
-      errors: [
-        {
-          messageId: 'useExplicitReturn',
-        },
-      ],
+      errors: [{ messageId: 'useExplicitReturn' }],
 
       output: dedent`
         const data = () => { return {
@@ -119,26 +99,15 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
 
     {
       code: 'export const defineConfig = <T extends Linter.Config>(config: T) => config',
-
-      errors: [
-        {
-          messageId: 'useExplicitReturn',
-        },
-      ],
-
+      errors: [{ messageId: 'useExplicitReturn' }],
       output: 'export const defineConfig = <T extends Linter.Config>(config: T) => { return config }',
     },
 
     {
       code: 'const Div = () => <><div /></>',
-
-      errors: [
-        {
-          messageId: 'useExplicitReturn',
-        },
-      ],
-
+      errors: [{ messageId: 'useExplicitReturn' }],
       output: 'const Div = () => { return <><div /></> }',
+      options: [{ jsxAlwaysUseExplicitReturn: true }],
     },
 
     {
@@ -153,11 +122,7 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
         />
       `,
 
-      errors: [
-        {
-          messageId: 'useExplicitReturn',
-        },
-      ],
+      errors: [{ messageId: 'useExplicitReturn' }],
 
       output: dedent`
         const FC = () =>
@@ -178,11 +143,7 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
         );
       `,
 
-      errors: [
-        {
-          messageId: 'useExplicitReturn',
-        },
-      ],
+      errors: [{ messageId: 'useExplicitReturn' }],
 
       output: dedent`
         export const createRule = ESLintUtils.RuleCreator(
@@ -193,14 +154,9 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
 
     {
       code: 'const render = () => (<div />)',
-
-      errors: [
-        {
-          messageId: 'useExplicitReturn',
-        },
-      ],
-
+      errors: [{ messageId: 'useExplicitReturn' }],
       output: 'const render = () => { return <div /> }',
+      options: [{ jsxAlwaysUseExplicitReturn: true }],
     },
   ],
 
@@ -209,6 +165,11 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
     'const fn = () => { return }',
 
     'Array.from({ length: 10 }).map((_, i) => i + 1)',
+
+    {
+      code: 'const Div = () => <><div /></>',
+      options: [{ jsxAlwaysUseExplicitReturn: false }],
+    },
 
     dedent`
       const bar = () => {

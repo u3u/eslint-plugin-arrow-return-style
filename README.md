@@ -6,10 +6,10 @@
 
 ## Features
 
-> This rule serves as an alternative to the [`arrow-body-style`](https://eslint.org/docs/latest/rules/arrow-body-style#as-needed) with `as-needed` options, used to improve the style of arrow function return values.
+> This rule serves as an alternative to the [`arrow-body-style`](https://eslint.org/docs/latest/rules/arrow-body-style#as-needed) with `as-needed` options, used to improve the style of arrow function return statement.
 
 - When arrow function expressions are multiline or exceed a certain length, explicit return should be enforced to improve readability and extensibility.
-- When an arrow function has only one return value (and does not contain any comments), implicit return should be used to simplify the code and improve readability.
+- When an arrow function has only one return statement (and does not contain any comments), implicit return should be used to simplify the code and improve readability.
 - When using arrow functions as named exports, explicit return should always be used to maintain consistency with regular functions.
 - When using arrow functions as React components, always use explicit return to facilitate the addition of `props` and `hooks` in the future.
 
@@ -36,6 +36,13 @@ Type: `number`\
 Default: `80`
 
 If the arrow function expression exceeds `maxLen` characters, it is forced to use explicit return.
+
+### `jsxAlwaysUseExplicitReturn`
+
+Type: `boolean`\
+Default: `false`
+
+If set `true`, always use explicit return.
 
 ## Rules
 

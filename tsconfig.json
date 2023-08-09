@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["esnext"],
-    "module": "esnext",
-    "moduleResolution": "node16",
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "resolveJsonModule": true,
-    "target": "esnext"
+    "strict": true
   },
 
   "extends": "@tsconfig/node18/tsconfig.json"

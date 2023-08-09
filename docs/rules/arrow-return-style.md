@@ -14,3 +14,10 @@ Type: `number`\
 Default: `80`
 
 If the arrow function expression exceeds `maxLen` characters, it is forced to use explicit return.
+
+### `jsxAlwaysUseExplicitReturn`
+
+Type: `boolean`\
+Default: `false`
+
+If set `true`, always use explicit return.
