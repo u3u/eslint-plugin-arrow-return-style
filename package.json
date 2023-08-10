@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-arrow-return-style",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Enforce arrow function return style and automatically fix it",
   "keywords": [
     "arrow-body-style",
