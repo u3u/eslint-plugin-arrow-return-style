@@ -20,4 +20,4 @@ If the arrow function expression exceeds `maxLen` characters, it is forced to us
 Type: `boolean`\
 Default: `false`
 
-If set `true`, always use explicit return.
+If set `true`, always use explicit return when return value is `JSXElement` or `JSXFragment`.

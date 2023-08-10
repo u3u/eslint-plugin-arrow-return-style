@@ -1,6 +1,6 @@
 # eslint-plugin-arrow-return-style
 
-> Enforce arrow function return style
+> Enforce arrow function return style and automatically fix it
 
 [![npm version](https://badgen.net/npm/v/eslint-plugin-arrow-return-style)](https://npm.im/eslint-plugin-arrow-return-style) [![npm downloads](https://badgen.net/npm/dm/eslint-plugin-arrow-return-style)](https://npm.im/eslint-plugin-arrow-return-style) [![codecov](https://codecov.io/gh/u3u/eslint-plugin-arrow-return-style/branch/main/graph/badge.svg)](https://codecov.io/gh/u3u/eslint-plugin-arrow-return-style)
 
@@ -42,7 +42,7 @@ If the arrow function expression exceeds `maxLen` characters, it is forced to us
 Type: `boolean`\
 Default: `false`
 
-If set `true`, always use explicit return.
+If set `true`, always use explicit return when return value is `JSXElement` or `JSXFragment`.
 
 ## Rules
 
