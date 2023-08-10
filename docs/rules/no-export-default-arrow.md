@@ -9,6 +9,7 @@
 If the default export is an anonymous arrow function, it will automatically be converted to a named function using the current file name for exporting.
 
 ```ts
+// eslint-disable-next-line arrow-return-style/no-export-default-arrow
 export default () => {
   // ...
 };
