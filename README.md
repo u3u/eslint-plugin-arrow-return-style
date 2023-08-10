@@ -28,7 +28,9 @@ module.exports = {
 };
 ```
 
-## Fail
+## Examples
+
+### Fail
 
 ```tsx
 /* eslint-disable arrow-return-style/arrow-return-style */
@@ -65,7 +67,7 @@ const Div = () => (
 );
 ```
 
-## Pass
+### Pass
 
 ```tsx
 const delay = () => {

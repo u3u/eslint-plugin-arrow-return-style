@@ -8,6 +8,8 @@
 
 If the default export is an anonymous arrow function, it will automatically be converted to a named function using the current file name for exporting.
 
+**File Name: `use-mouse.tsx`**
+
 ```ts
 // eslint-disable-next-line arrow-return-style/no-export-default-arrow
 export default () => {
@@ -16,9 +18,9 @@ export default () => {
 
 // ↓↓↓↓↓↓↓↓↓↓
 
-const autoFixToCurrentFileName = () => {
+const useMouse = () => {
   // ...
 };
 
-export default autoFixToCurrentFileName;
+export default useMouse;
 ```
