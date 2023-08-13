@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.0",
-    "@types/node": "^18.17.4",
+    "@types/node": "^18.17.5",
     "@typescript-eslint/rule-tester": "^6.3.0",
     "@u3u/eslint-config": "^2.9.2",
     "@u3u/prettier-config": "^3.0.1",
@@ -70,7 +70,7 @@
     "eslint-doc-generator": "^1.4.3",
     "eslint-plugin-arrow-return-style": "link:",
     "fix-tsup-cjs": "^1.2.0",
-    "lint-staged": "^13.2.3",
+    "lint-staged": "^13.3.0",
     "prettier": "^2.8.8",
     "simple-git-hooks": "^2.9.0",
     "tsup": "^7.2.0",
