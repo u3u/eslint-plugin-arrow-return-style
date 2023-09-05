@@ -70,7 +70,7 @@
     "eslint-doc-generator": "^1.4.3",
     "eslint-plugin-arrow-return-style": "link:",
     "fix-tsup-cjs": "^1.2.0",
-    "lint-staged": "^13.3.0",
+    "lint-staged": "^14.0.1",
     "prettier": "^2.8.8",
     "simple-git-hooks": "^2.9.0",
     "tsup": "^7.2.0",
