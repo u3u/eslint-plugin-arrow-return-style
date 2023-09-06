@@ -96,6 +96,50 @@ ruleTester.run(RULE_NAME, noExportDefaultArrowRule, {
         export default justForFun
       `,
     },
+
+    {
+      code: dedent`
+        export default () => {
+          return (
+            <html>
+              <head />
+              <body></body>
+            </html>
+          )
+        }
+      `,
+
+      errors: [{ messageId: 'disallowExportDefaultArrow' }],
+
+      filename: 'layout.tsx',
+
+      output: dedent`
+        const Layout = () => {
+          return (
+            <html>
+              <head />
+              <body></body>
+            </html>
+          )
+        }
+
+        export default Layout
+      `,
+    },
+
+    {
+      code: 'export default () => <></>',
+
+      errors: [{ messageId: 'disallowExportDefaultArrow' }],
+
+      filename: 'page.tsx',
+
+      output: dedent`
+        const Page = () => <></>
+
+        export default Page
+      `,
+    },
   ],
 
   valid: [

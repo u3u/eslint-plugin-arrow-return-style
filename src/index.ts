@@ -1,3 +1,4 @@
+import '@total-typescript/ts-reset';
 import type { Rule } from 'eslint';
 import { name, version } from '../package.json';
 import recommended from './configs/recommended';

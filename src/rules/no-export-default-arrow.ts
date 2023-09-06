@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { AST_NODE_TYPES, ASTUtils, type TSESTree } from '@typescript-eslint/utils';
-import { camelCase } from 'scule';
+import { camelCase, pascalCase } from 'scule';
 import { createRule } from '../utils/create-rule';
 
 export const RULE_NAME = 'no-export-default-arrow';
@@ -14,6 +14,31 @@ export const noExportDefaultArrowRule = createRule({
       ArrowFunctionExpression: (arrowFunction) => {
         const { body: arrowBody, parent: arrowFunctionParent } = arrowFunction;
 
+        const isJsxElement = (node: TSESTree.Expression) => {
+          return node.type === AST_NODE_TYPES.JSXElement || node.type === AST_NODE_TYPES.JSXFragment;
+        };
+
+        const getArrowReturnValues = () => {
+          if (arrowBody.type === AST_NODE_TYPES.BlockStatement) {
+            const blockBody = arrowBody.body;
+
+            const returnValues = blockBody
+              .filter((node): node is TSESTree.ReturnStatement => node.type === AST_NODE_TYPES.ReturnStatement)
+              .map((node) => node.argument)
+              .filter(Boolean);
+
+            return returnValues;
+          }
+
+          return [arrowBody];
+        };
+
+        const arrowReturnIsJsxElement = () => {
+          const returnValues = getArrowReturnValues();
+
+          return returnValues.some((node) => isJsxElement(node));
+        };
+
         if (arrowFunctionParent.type === AST_NODE_TYPES.ExportDefaultDeclaration) {
           context.report({
             fix: (fixer) => {
@@ -21,7 +46,10 @@ export const noExportDefaultArrowRule = createRule({
               const lastToken = sourceCode.getLastToken(program, { includeComments: true }) || arrowFunctionParent;
               const fileName = context.getPhysicalFilename?.() || context.getFilename() || 'namedFunction';
               const { name: fileNameWithoutExtension } = path.parse(fileName);
-              const funcName = camelCase(fileNameWithoutExtension);
+
+              const funcName = arrowReturnIsJsxElement()
+                ? pascalCase(fileNameWithoutExtension)
+                : camelCase(fileNameWithoutExtension);
 
               fixes.push(
                 fixer.replaceText(arrowFunctionParent, `const ${funcName} = ${sourceCode.getText(arrowFunction)}`),
