@@ -25,7 +25,7 @@ export const noExportDefaultArrowRule = createRule({
 
               fixes.push(
                 fixer.replaceText(arrowFunctionParent, `const ${funcName} = ${sourceCode.getText(arrowFunction)}`),
-                fixer.insertTextAfter(lastToken, `\n\nexport default ${funcName}`)
+                fixer.insertTextAfter(lastToken, `\n\nexport default ${funcName}`),
               );
 
               return fixes;

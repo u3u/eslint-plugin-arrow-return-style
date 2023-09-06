@@ -5,7 +5,7 @@ type Options = [
   {
     jsxAlwaysUseExplicitReturn?: boolean;
     maxLen?: number;
-  }
+  },
 ];
 
 type MessageIds = 'useExplicitReturn' | 'useImplicitReturn';
@@ -78,7 +78,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
                 fixes.push(
                   fixer.remove(openingBrace),
                   fixer.remove(closingBrace),
-                  fixer.replaceText(returnStatement, isObjectLiteral(returnValue) ? `(${returnText})` : returnText)
+                  fixer.replaceText(returnStatement, isObjectLiteral(returnValue) ? `(${returnText})` : returnText),
                 );
 
                 return fixes;
@@ -119,7 +119,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
                   fixes.push(
                     fixer.insertTextAfter(arrowToken, ' {'),
                     fixer.insertTextBefore(arrowBody, 'return '),
-                    fixer.insertTextAfter(arrowBody, '\n}')
+                    fixer.insertTextAfter(arrowBody, '\n}'),
                   );
                 } else {
                   fixes.push(fixer.replaceText(arrowBody, `{ return ${sourceCode.getText(arrowBody)} }`));
