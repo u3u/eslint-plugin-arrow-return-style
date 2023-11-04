@@ -59,21 +59,21 @@
     ]
   },
   "dependencies": {
-    "@typescript-eslint/utils": "^6.9.0",
+    "@typescript-eslint/utils": "^6.9.1",
     "scule": "^1.0.0"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
     "@tsconfig/node18": "^18.2.2",
-    "@types/node": "^18.18.7",
-    "@typescript-eslint/rule-tester": "^6.9.0",
+    "@types/node": "^18.18.8",
+    "@typescript-eslint/rule-tester": "^6.9.1",
     "@u3u/eslint-config": "^2.12.1",
     "@u3u/prettier-config": "^4.1.2",
     "@vitest/coverage-v8": "^0.34.6",
     "@vitest/ui": "^0.34.6",
     "dedent": "^1.5.1",
-    "eslint": "^8.52.0",
-    "eslint-doc-generator": "^1.5.2",
+    "eslint": "^8.53.0",
+    "eslint-doc-generator": "^1.5.3",
     "eslint-plugin-arrow-return-style": "link:",
     "fix-tsup-cjs": "^1.2.0",
     "lint-staged": "^14.0.1",
@@ -86,7 +86,7 @@
   "peerDependencies": {
     "eslint": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.10.0",
+  "packageManager": "pnpm@8.10.2",
   "publishConfig": {
     "access": "public"
   },
