@@ -2,7 +2,10 @@
 
 > Enforce arrow function return style and automatically fix it
 
-[![npm version](https://badgen.net/npm/v/eslint-plugin-arrow-return-style)](https://npm.im/eslint-plugin-arrow-return-style) [![npm downloads](https://badgen.net/npm/dm/eslint-plugin-arrow-return-style)](https://npm.im/eslint-plugin-arrow-return-style) [![codecov](https://codecov.io/gh/u3u/eslint-plugin-arrow-return-style/branch/main/graph/badge.svg)](https://codecov.io/gh/u3u/eslint-plugin-arrow-return-style)
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![codecov][codecov-src]][codecov-href]
+[![License][license-src]][license-href]
 
 ## Features
 
@@ -142,3 +145,14 @@ If set `true`, always use explicit return when return value is `JSXElement` or `
 ## License
 
 [MIT](./LICENSE) License © 2023 [u3u](https://github.com/u3u)
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/eslint-plugin-arrow-return-style
+[npm-version-href]: https://npmjs.com/package/eslint-plugin-arrow-return-style
+[npm-downloads-src]: https://img.shields.io/npm/dm/eslint-plugin-arrow-return-style
+[npm-downloads-href]: https://npmjs.com/package/eslint-plugin-arrow-return-style
+[codecov-src]: https://codecov.io/gh/u3u/eslint-plugin-arrow-return-style/graph/badge.svg
+[codecov-href]: https://codecov.io/gh/u3u/eslint-plugin-arrow-return-style
+[license-src]: https://img.shields.io/github/license/u3u/eslint-plugin-arrow-return-style.svg
+[license-href]: ./LICENSE
