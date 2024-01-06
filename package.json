@@ -44,7 +44,7 @@
     "format": "prettier --write .",
     "lint": "eslint --fix .",
     "prepare": "pnpm build",
-    "test": "vitest --ui --coverage",
+    "test": "vitest --ui --coverage.enabled --coverage.all=false",
     "update:eslint-docs": "pnpm build && eslint-doc-generator"
   },
   "simple-git-hooks": {
