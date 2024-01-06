@@ -97,3 +97,12 @@ Type: `boolean`\
 Default: `false`
 
 If set `true`, always use explicit return when return value is `JSXElement` or `JSXFragment`.
+
+### `namedExportsAlwaysUseExplicitReturn`
+
+Type: `boolean`\
+Default: `true`
+
+By default, named exported arrow functions will always use explicit return to maintain consistency with regular functions because it is more intuitive and unified, and convenient for expansion.
+
+See [#57](https://github.com/u3u/eslint-plugin-arrow-return-style/issues/57)

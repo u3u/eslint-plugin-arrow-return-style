@@ -5,6 +5,7 @@ type Options = [
   {
     jsxAlwaysUseExplicitReturn?: boolean;
     maxLen?: number;
+    namedExportsAlwaysUseExplicitReturn?: boolean;
   },
 ];
 
@@ -19,7 +20,12 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
     return {
       ArrowFunctionExpression: (arrowFunction) => {
         const { body: arrowBody, parent: arrowFunctionParent } = arrowFunction;
-        const { jsxAlwaysUseExplicitReturn, maxLen = 80 } = context.options?.[0] || {};
+
+        const {
+          jsxAlwaysUseExplicitReturn,
+          maxLen = 80,
+          namedExportsAlwaysUseExplicitReturn = true,
+        } = context.options?.[0] || {};
 
         const isMaxLen = (node = arrowBody) => node.loc.end.column - node.loc.start.column >= maxLen;
         const isMultiline = (node = arrowBody) => node.loc.start.line !== node.loc.end.line;
@@ -54,10 +60,10 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
             const returnValue = returnStatement.argument;
 
             if (!returnValue) return;
-            if (isNamedExport()) return;
             if (isMaxLen(returnValue)) return;
             if (isMultiline(returnValue)) return;
             if (jsxAlwaysUseExplicitReturn && isJsxElement(returnValue)) return;
+            if (namedExportsAlwaysUseExplicitReturn && isNamedExport()) return;
 
             const openingBrace = sourceCode.getFirstToken(arrowBody)!;
             const closingBrace = sourceCode.getLastToken(arrowBody)!;
@@ -96,8 +102,8 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
             commentsExist ||
             isMaxLen() ||
             isMultiline() ||
-            isNamedExport() ||
-            (jsxAlwaysUseExplicitReturn && isJsxElement())
+            (jsxAlwaysUseExplicitReturn && isJsxElement()) ||
+            (namedExportsAlwaysUseExplicitReturn && isNamedExport())
           ) {
             context.report({
               fix: (fixer) => {
@@ -141,6 +147,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
     {
       jsxAlwaysUseExplicitReturn: false,
       maxLen: 80,
+      namedExportsAlwaysUseExplicitReturn: true,
     },
   ],
 
@@ -163,6 +170,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
         properties: {
           jsxAlwaysUseExplicitReturn: { default: false, type: 'boolean' },
           maxLen: { default: 80, type: 'number' },
+          namedExportsAlwaysUseExplicitReturn: { default: true, type: 'boolean' },
         },
 
         type: 'object',

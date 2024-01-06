@@ -111,6 +111,13 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
     },
 
     {
+      code: 'export const Div = () => <><div /></>',
+      errors: [{ messageId: 'useExplicitReturn' }],
+      options: [{ namedExportsAlwaysUseExplicitReturn: true }],
+      output: 'export const Div = () => { return <><div /></> }',
+    },
+
+    {
       code: dedent`
         const FC = () =>
           <Foo
@@ -221,8 +228,13 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
 
     dedent`
       export const getUser = async () => {
-        return {}
+        return { name: 'admin' }
       }
     `,
+
+    {
+      code: "export const getUser = async () => ({ name: 'admin' })",
+      options: [{ namedExportsAlwaysUseExplicitReturn: false }],
+    },
   ],
 });
