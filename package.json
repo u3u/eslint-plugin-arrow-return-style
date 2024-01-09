@@ -59,14 +59,14 @@
     ]
   },
   "dependencies": {
-    "@typescript-eslint/utils": "^6.17.0",
+    "@typescript-eslint/utils": "^6.18.1",
     "scule": "^1.1.1"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
     "@tsconfig/node20": "^20.1.2",
-    "@types/node": "^20.10.6",
-    "@typescript-eslint/rule-tester": "^6.17.0",
+    "@types/node": "^20.10.8",
+    "@typescript-eslint/rule-tester": "^6.18.1",
     "@u3u/eslint-config": "^2.15.0",
     "@u3u/prettier-config": "^4.1.4",
     "@vitest/coverage-v8": "^1.1.3",
