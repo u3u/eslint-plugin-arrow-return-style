@@ -59,14 +59,14 @@
     ]
   },
   "dependencies": {
-    "@typescript-eslint/utils": "^6.19.0",
+    "@typescript-eslint/utils": "^6.19.1",
     "scule": "^1.2.0"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
     "@tsconfig/node20": "^20.1.2",
-    "@types/node": "^20.11.5",
-    "@typescript-eslint/rule-tester": "^6.19.0",
+    "@types/node": "^20.11.6",
+    "@typescript-eslint/rule-tester": "^6.19.1",
     "@u3u/eslint-config": "^2.15.0",
     "@u3u/prettier-config": "^4.3.0",
     "@vitest/coverage-v8": "^1.2.1",
@@ -86,7 +86,7 @@
   "peerDependencies": {
     "eslint": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.14.1",
+  "packageManager": "pnpm@8.14.3",
   "publishConfig": {
     "access": "public"
   },
