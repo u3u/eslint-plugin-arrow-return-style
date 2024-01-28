@@ -65,12 +65,12 @@
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
     "@tsconfig/node20": "^20.1.2",
-    "@types/node": "^20.11.6",
+    "@types/node": "^20.11.9",
     "@typescript-eslint/rule-tester": "^6.19.1",
     "@u3u/eslint-config": "^2.15.0",
     "@u3u/prettier-config": "^4.3.0",
-    "@vitest/coverage-v8": "^1.2.1",
-    "@vitest/ui": "^1.2.1",
+    "@vitest/coverage-v8": "^1.2.2",
+    "@vitest/ui": "^1.2.2",
     "dedent": "^1.5.1",
     "eslint": "^8.56.0",
     "eslint-doc-generator": "^1.6.2",
@@ -81,12 +81,12 @@
     "simple-git-hooks": "^2.9.0",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.1"
+    "vitest": "^1.2.2"
   },
   "peerDependencies": {
     "eslint": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.14.3",
+  "packageManager": "pnpm@8.15.0",
   "publishConfig": {
     "access": "public"
   },
