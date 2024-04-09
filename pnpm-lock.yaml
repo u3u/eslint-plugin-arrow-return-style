@@ -20,8 +20,8 @@ devDependencies:
     specifier: ^20.1.4
     version: 20.1.4
   '@types/node':
-    specifier: ^20.12.5
-    version: 20.12.5
+    specifier: ^20.12.6
+    version: 20.12.6
   '@typescript-eslint/rule-tester':
     specifier: ^6.21.0
     version: 6.21.0(@eslint/eslintrc@2.1.4)(eslint@8.57.0)(typescript@5.4.4)
@@ -69,7 +69,7 @@ devDependencies:
     version: 5.4.4
   vitest:
     specifier: ^1.4.0
-    version: 1.4.0(@types/node@20.12.5)(@vitest/ui@1.4.0)
+    version: 1.4.0(@types/node@20.12.6)(@vitest/ui@1.4.0)
 
 packages:
 
@@ -921,7 +921,7 @@ packages:
   /@types/concat-stream@2.0.3:
     resolution: {integrity: sha512-3qe4oQAPNwVNwK4C9c8u+VJqv9kez+2MR4qJpoPFfXtgxxif1QbFusvXzK0/Wra2VX07smostI2VMmJNSpZjuQ==}
     dependencies:
-      '@types/node': 20.12.5
+      '@types/node': 20.12.6
     dev: true
 
   /@types/debug@4.1.8:
@@ -988,8 +988,8 @@ packages:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: true
 
-  /@types/node@20.12.5:
-    resolution: {integrity: sha512-BD+BjQ9LS/D8ST9p5uqBxghlN+S42iuNxjsUGjeZobe/ciXzk2qb1B6IXc6AnRLS+yFJRpN2IPEHMzwspfDJNw==}
+  /@types/node@20.12.6:
+    resolution: {integrity: sha512-3KurE8taB8GCvZBPngVbp0lk5CKi8M9f9k1rsADh0Evdz5SzJ+Q+Hx9uHoFGsLnLnd1xmkDQr2hVhlA0Mn0lKQ==}
     dependencies:
       undici-types: 5.26.5
     dev: true
@@ -1407,7 +1407,7 @@ packages:
       strip-literal: 2.0.0
       test-exclude: 6.0.0
       v8-to-istanbul: 9.2.0
-      vitest: 1.4.0(@types/node@20.12.5)(@vitest/ui@1.4.0)
+      vitest: 1.4.0(@types/node@20.12.6)(@vitest/ui@1.4.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -1454,7 +1454,7 @@ packages:
       pathe: 1.1.1
       picocolors: 1.0.0
       sirv: 2.0.4
-      vitest: 1.4.0(@types/node@20.12.5)(@vitest/ui@1.4.0)
+      vitest: 1.4.0(@types/node@20.12.6)(@vitest/ui@1.4.0)
     dev: true
 
   /@vitest/utils@1.4.0:
@@ -6721,7 +6721,7 @@ packages:
       '@types/concat-stream': 2.0.3
       '@types/debug': 4.1.8
       '@types/is-empty': 1.2.3
-      '@types/node': 20.12.5
+      '@types/node': 20.12.6
       '@types/unist': 3.0.0
       '@ungap/structured-clone': 1.2.0
       concat-stream: 2.0.0
@@ -6908,7 +6908,7 @@ packages:
       vfile-message: 4.0.2
     dev: true
 
-  /vite-node@1.4.0(@types/node@20.12.5):
+  /vite-node@1.4.0(@types/node@20.12.6):
     resolution: {integrity: sha512-VZDAseqjrHgNd4Kh8icYHWzTKSCZMhia7GyHfhtzLW33fZlG9SwsB6CEhgyVOWkJfJ2pFLrp/Gj1FSfAiqH9Lw==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -6917,7 +6917,7 @@ packages:
       debug: 4.3.4
       pathe: 1.1.1
       picocolors: 1.0.0
-      vite: 5.0.11(@types/node@20.12.5)
+      vite: 5.0.11(@types/node@20.12.6)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -6929,7 +6929,7 @@ packages:
       - terser
     dev: true
 
-  /vite@5.0.11(@types/node@20.12.5):
+  /vite@5.0.11(@types/node@20.12.6):
     resolution: {integrity: sha512-XBMnDjZcNAw/G1gEiskiM1v6yzM4GE5aMGvhWTlHAYYhxb7S3/V1s3m2LDHa8Vh6yIWYYB0iJwsEaS523c4oYA==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -6957,7 +6957,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.12.5
+      '@types/node': 20.12.6
       esbuild: 0.19.5
       postcss: 8.4.33
       rollup: 4.5.0
@@ -6965,7 +6965,7 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /vitest@1.4.0(@types/node@20.12.5)(@vitest/ui@1.4.0):
+  /vitest@1.4.0(@types/node@20.12.6)(@vitest/ui@1.4.0):
     resolution: {integrity: sha512-gujzn0g7fmwf83/WzrDTnncZt2UiXP41mHuFYFrdwaLRVQ6JYQEiME2IfEjU3vcFL3VKa75XhI3lFgn+hfVsQw==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -6990,7 +6990,7 @@ packages:
       jsdom:
         optional: true
     dependencies:
-      '@types/node': 20.12.5
+      '@types/node': 20.12.6
       '@vitest/expect': 1.4.0
       '@vitest/runner': 1.4.0
       '@vitest/snapshot': 1.4.0
@@ -7009,8 +7009,8 @@ packages:
       strip-literal: 2.0.0
       tinybench: 2.5.1
       tinypool: 0.8.2
-      vite: 5.0.11(@types/node@20.12.5)
-      vite-node: 1.4.0(@types/node@20.12.5)
+      vite: 5.0.11(@types/node@20.12.6)
+      vite-node: 1.4.0(@types/node@20.12.6)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less
