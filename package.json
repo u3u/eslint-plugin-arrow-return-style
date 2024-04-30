@@ -69,8 +69,8 @@
     "@typescript-eslint/rule-tester": "^6.21.0",
     "@u3u/eslint-config": "^2.15.1",
     "@u3u/prettier-config": "^4.5.1",
-    "@vitest/coverage-v8": "^1.5.2",
-    "@vitest/ui": "^1.5.2",
+    "@vitest/coverage-v8": "^1.5.3",
+    "@vitest/ui": "^1.5.3",
     "dedent": "^1.5.3",
     "eslint": "^8.57.0",
     "eslint-doc-generator": "^1.7.0",
@@ -81,12 +81,12 @@
     "simple-git-hooks": "^2.11.1",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5",
-    "vitest": "^1.5.2"
+    "vitest": "^1.5.3"
   },
   "peerDependencies": {
     "eslint": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.15.7",
+  "packageManager": "pnpm@8.15.8",
   "publishConfig": {
     "access": "public"
   },
