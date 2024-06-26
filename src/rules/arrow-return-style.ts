@@ -1,4 +1,4 @@
-import { AST_NODE_TYPES, ASTUtils } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, ASTUtils, type TSESTree } from '@typescript-eslint/utils';
 import { createRule } from '../utils/create-rule';
 
 type Options = [
@@ -27,9 +27,27 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
           namedExportsAlwaysUseExplicitReturn = true,
         } = context.options?.[0] || {};
 
-        const isMaxLen = (node = arrowBody) => node.loc.end.column - node.loc.start.column >= maxLen;
-        const isMultiline = (node = arrowBody) => node.loc.start.line !== node.loc.end.line;
-        const isObjectLiteral = (node = arrowBody) => node.type === AST_NODE_TYPES.ObjectExpression;
+        const isVariableDeclaration = (
+          node: TSESTree.Node | null | undefined,
+        ): node is TSESTree.VariableDeclaration => {
+          return node?.type === AST_NODE_TYPES.VariableDeclaration;
+        };
+
+        const getArrowVariableDeclaration = () => {
+          return isVariableDeclaration(arrowFunctionParent.parent) ? arrowFunctionParent.parent : undefined;
+        };
+
+        const arrowRoot = getArrowVariableDeclaration() || arrowFunctionParent;
+
+        const isMaxLen = (node = arrowRoot) => node.range[1] - node.range[0] > maxLen;
+
+        const isMultiline = (node = arrowRoot) => {
+          return node.loc.start.line !== node.loc.end.line;
+        };
+
+        const isObjectLiteral = (node = arrowBody) => {
+          return node.type === AST_NODE_TYPES.ObjectExpression;
+        };
 
         const isJsxElement = (node = arrowBody) => {
           return node.type === AST_NODE_TYPES.JSXElement || node.type === AST_NODE_TYPES.JSXFragment;
@@ -60,6 +78,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
             const returnValue = returnStatement.argument;
 
             if (!returnValue) return;
+            if (isMaxLen()) return;
             if (isMaxLen(returnValue)) return;
             if (isMultiline(returnValue)) return;
             if (jsxAlwaysUseExplicitReturn && isJsxElement(returnValue)) return;

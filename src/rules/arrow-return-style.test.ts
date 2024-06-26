@@ -19,6 +19,50 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
   invalid: [
     {
       code: dedent`
+        const UDimTemporary = (value: UDim, rem: number): UDim => new UDim(value.Scale, value.Offset * rem);
+      `,
+
+      errors: [{ messageId: 'useExplicitReturn' }],
+
+      output: dedent`
+        const UDimTemporary = (value: UDim, rem: number): UDim => { return new UDim(value.Scale, value.Offset * rem) };
+      `,
+    },
+
+    {
+      code: dedent`
+        const obj = {
+          UDimTemporary11111111111: (value: UDim, rem: number): UDim =>
+            new UDim(value.Scale, value.Offset * rem),
+        };
+      `,
+
+      errors: [{ messageId: 'useExplicitReturn' }],
+
+      output: dedent`
+        const obj = {
+          UDimTemporary11111111111: (value: UDim, rem: number): UDim =>
+            { return new UDim(value.Scale, value.Offset * rem) },
+        };
+      `,
+    },
+
+    {
+      code: dedent`
+        const isVariableDeclaration = (node: TSESTree.Node | null | undefined): node is TSESTree.VariableDeclaration =>
+          node?.type === AST_NODE_TYPES.VariableDeclaration;
+      `,
+
+      errors: [{ messageId: 'useExplicitReturn' }],
+
+      output: dedent`
+        const isVariableDeclaration = (node: TSESTree.Node | null | undefined): node is TSESTree.VariableDeclaration =>
+          { return node?.type === AST_NODE_TYPES.VariableDeclaration };
+      `,
+    },
+
+    {
+      code: dedent`
         const delay = () =>
           new Promise((resolve) => {
             setTimeout(resolve, 1000)
@@ -236,5 +280,27 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
       code: "export const getUser = async () => ({ name: 'admin' })",
       options: [{ namedExportsAlwaysUseExplicitReturn: false }],
     },
+
+    dedent`
+      const isMaxLen = (node = arrowRoot) => {
+        return node.loc.end.column - node.loc.start.column >= maxLen;
+      };
+    `,
+
+    dedent`
+      const isVariableDeclaration = (
+        node: TSESTree.Node | null | undefined,
+      ): node is TSESTree.VariableDeclaration => {
+        return node?.type === AST_NODE_TYPES.VariableDeclaration;
+      };
+    `,
+
+    dedent`
+      const obj = {
+        temporary: (v: UDim, rem = 0) => {
+          return new UDim(v.Scale, v.Offset * rem);
+        },
+      };
+    `,
   ],
 });
