@@ -41,7 +41,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
 
         const isMaxLen = (node = arrowRoot) => node.range[1] - node.range[0] > maxLen;
 
-        const isMultiline = (node = arrowRoot) => {
+        const isMultiline = (node = arrowBody) => {
           return node.loc.start.line !== node.loc.end.line;
         };
 
