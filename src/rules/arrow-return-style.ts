@@ -27,9 +27,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
           namedExportsAlwaysUseExplicitReturn = true,
         } = context.options?.[0] || {};
 
-        const isMaxLen = (node: TSESTree.Node = getArrowRoot()) => {
-          return getTokensLength(node) > maxLen;
-        };
+        const isMaxLen = (node: TSESTree.Node = getArrowRoot()) => getTokensLength(node) > maxLen;
 
         const isMultiline = (node: TSESTree.NodeOrTokenData = arrowBody) => {
           return node.loc.start.line !== node.loc.end.line;
