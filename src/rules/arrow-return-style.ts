@@ -1,4 +1,4 @@
-import { AST_NODE_TYPES, ASTUtils } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, AST_TOKEN_TYPES, ASTUtils, type TSESTree } from '@typescript-eslint/utils';
 import { createRule } from '../utils/create-rule';
 
 type Options = [
@@ -27,16 +27,60 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
           namedExportsAlwaysUseExplicitReturn = true,
         } = context.options?.[0] || {};
 
-        const isMaxLen = (node = arrowBody) => node.loc.end.column - node.loc.start.column >= maxLen;
-        const isMultiline = (node = arrowBody) => node.loc.start.line !== node.loc.end.line;
-        const isObjectLiteral = (node = arrowBody) => node.type === AST_NODE_TYPES.ObjectExpression;
+        const isMaxLen = (node: TSESTree.Node = getArrowRoot()) => getTokensLength(node) > maxLen;
 
-        const isJsxElement = (node = arrowBody) => {
+        const isMultiline = (node: TSESTree.NodeOrTokenData = arrowBody) => {
+          return node.loc.start.line !== node.loc.end.line;
+        };
+
+        const isObjectLiteral = (node: TSESTree.NodeOrTokenData = arrowBody) => {
+          return node.type === AST_NODE_TYPES.ObjectExpression;
+        };
+
+        const isJsxElement = (node: TSESTree.NodeOrTokenData = arrowBody) => {
           return node.type === AST_NODE_TYPES.JSXElement || node.type === AST_NODE_TYPES.JSXFragment;
         };
 
         const isNamedExport = () => {
           return arrowFunctionParent.parent?.parent?.type === AST_NODE_TYPES.ExportNamedDeclaration;
+        };
+
+        const isCallExpression = (node?: TSESTree.Node): node is TSESTree.CallExpression => {
+          return node?.type === AST_NODE_TYPES.CallExpression;
+        };
+
+        const isVariableDeclaration = (node?: TSESTree.Node): node is TSESTree.VariableDeclaration => {
+          return node?.type === AST_NODE_TYPES.VariableDeclaration;
+        };
+
+        const getArrowVariableDeclaration = () => {
+          return isVariableDeclaration(arrowFunctionParent.parent) ? arrowFunctionParent.parent : undefined;
+        };
+
+        const getArrowRoot = () => {
+          return isCallExpression(arrowFunctionParent)
+            ? arrowFunction
+            : getArrowVariableDeclaration() || arrowFunctionParent;
+        };
+
+        const getLength = (node: TSESTree.NodeOrTokenData) => {
+          return node.loc.end.column - node.loc.start.column;
+        };
+
+        const getTokensLength = (node: TSESTree.Node = getArrowRoot()) => {
+          const tokens = sourceCode.getTokens(node);
+
+          const implicitReturnTokens = tokens
+            .filter(ASTUtils.isNotOpeningBraceToken)
+            .filter((x) => !(x.type === AST_TOKEN_TYPES.Keyword && x.value === 'return'))
+            .filter(ASTUtils.isNotClosingBraceToken)
+            .filter(ASTUtils.isNotSemicolonToken);
+
+          const length = implicitReturnTokens.reduce((acc, token) => acc + getLength(token), 0);
+
+          // console.log(implicitReturnTokens.map((x) => x.value).join(''));
+
+          return length;
         };
 
         const getArrowToken = () => {
@@ -60,6 +104,7 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
             const returnValue = returnStatement.argument;
 
             if (!returnValue) return;
+            if (isMaxLen()) return;
             if (isMaxLen(returnValue)) return;
             if (isMultiline(returnValue)) return;
             if (jsxAlwaysUseExplicitReturn && isJsxElement(returnValue)) return;
