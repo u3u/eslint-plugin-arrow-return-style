@@ -63,6 +63,24 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
 
     {
       code: dedent`
+        const returnValues = blockBody
+          .filter((node): node is TSESTree.ReturnStatement => node.type === AST_NODE_TYPES.ReturnStatement)
+          .map((node) => node.argument)
+          .filter(Boolean);
+      `,
+
+      errors: [{ messageId: 'useExplicitReturn' }],
+
+      output: dedent`
+        const returnValues = blockBody
+          .filter((node): node is TSESTree.ReturnStatement => { return node.type === AST_NODE_TYPES.ReturnStatement })
+          .map((node) => node.argument)
+          .filter(Boolean);
+      `,
+    },
+
+    {
+      code: dedent`
         const delay = () =>
           new Promise((resolve) => {
             setTimeout(resolve, 1000)

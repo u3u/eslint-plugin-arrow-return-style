@@ -1,6 +1,8 @@
 import { AST_NODE_TYPES, ASTUtils, type TSESTree } from '@typescript-eslint/utils';
 import { createRule } from '../utils/create-rule';
 
+type Node = TSESTree.Node | null | undefined;
+
 type Options = [
   {
     jsxAlwaysUseExplicitReturn?: boolean;
@@ -27,9 +29,31 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
           namedExportsAlwaysUseExplicitReturn = true,
         } = context.options?.[0] || {};
 
-        const isVariableDeclaration = (
-          node: TSESTree.Node | null | undefined,
-        ): node is TSESTree.VariableDeclaration => {
+        const isMaxLen = (node: TSESTree.Node = getArrowRoot()) => {
+          return node.range[1] - node.range[0] > maxLen;
+        };
+
+        const isMultiline = (node: TSESTree.Node = arrowBody) => {
+          return node.loc.start.line !== node.loc.end.line;
+        };
+
+        const isObjectLiteral = (node: TSESTree.Node = arrowBody) => {
+          return node.type === AST_NODE_TYPES.ObjectExpression;
+        };
+
+        const isJsxElement = (node: TSESTree.Node = arrowBody) => {
+          return node.type === AST_NODE_TYPES.JSXElement || node.type === AST_NODE_TYPES.JSXFragment;
+        };
+
+        const isNamedExport = () => {
+          return arrowFunctionParent.parent?.parent?.type === AST_NODE_TYPES.ExportNamedDeclaration;
+        };
+
+        const isCallExpression = (node: Node): node is TSESTree.CallExpression => {
+          return node?.type === AST_NODE_TYPES.CallExpression;
+        };
+
+        const isVariableDeclaration = (node: Node): node is TSESTree.VariableDeclaration => {
           return node?.type === AST_NODE_TYPES.VariableDeclaration;
         };
 
@@ -37,24 +61,10 @@ export const arrowReturnStyleRule = createRule<Options, MessageIds>({
           return isVariableDeclaration(arrowFunctionParent.parent) ? arrowFunctionParent.parent : undefined;
         };
 
-        const arrowRoot = getArrowVariableDeclaration() || arrowFunctionParent;
-
-        const isMaxLen = (node = arrowRoot) => node.range[1] - node.range[0] > maxLen;
-
-        const isMultiline = (node = arrowBody) => {
-          return node.loc.start.line !== node.loc.end.line;
-        };
-
-        const isObjectLiteral = (node = arrowBody) => {
-          return node.type === AST_NODE_TYPES.ObjectExpression;
-        };
-
-        const isJsxElement = (node = arrowBody) => {
-          return node.type === AST_NODE_TYPES.JSXElement || node.type === AST_NODE_TYPES.JSXFragment;
-        };
-
-        const isNamedExport = () => {
-          return arrowFunctionParent.parent?.parent?.type === AST_NODE_TYPES.ExportNamedDeclaration;
+        const getArrowRoot = () => {
+          return isCallExpression(arrowFunctionParent)
+            ? arrowFunction
+            : getArrowVariableDeclaration() || arrowFunctionParent;
         };
 
         const getArrowToken = () => {
