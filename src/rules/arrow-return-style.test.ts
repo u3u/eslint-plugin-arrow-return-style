@@ -315,9 +315,7 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
 
     dedent`
       const obj = {
-        temporary: (v: UDim, rem = 0) => {
-          return new UDim(v.Scale, v.Offset * rem);
-        },
+        temporary: (v: UDim, rem = 0) => new UDim(v.Scale, v.Offset * rem),
       };
     `,
   ],
