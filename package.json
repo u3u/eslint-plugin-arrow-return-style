@@ -65,7 +65,7 @@
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
     "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^20.16.11",
+    "@types/node": "^20.16.12",
     "@typescript-eslint/rule-tester": "^7.18.0",
     "@u3u/eslint-config": "^2.15.2",
     "@u3u/prettier-config": "^5.1.0",
