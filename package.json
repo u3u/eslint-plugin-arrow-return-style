@@ -65,7 +65,7 @@
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
     "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^20.17.14",
+    "@types/node": "^20.17.16",
     "@typescript-eslint/rule-tester": "^7.18.0",
     "@u3u/eslint-config": "^2.15.2",
     "@u3u/prettier-config": "^5.1.0",
@@ -76,10 +76,10 @@
     "eslint-doc-generator": "^1.7.1",
     "eslint-plugin-arrow-return-style": "link:",
     "fix-tsup-cjs": "^1.2.0",
-    "lint-staged": "^15.4.1",
+    "lint-staged": "^15.4.3",
     "prettier": "^3.4.2",
     "simple-git-hooks": "^2.11.1",
-    "tsup": "^8.3.5",
+    "tsup": "^8.3.6",
     "typescript": "^5.7.3",
     "vitest": "^2.1.8"
   },
