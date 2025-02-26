@@ -79,14 +79,14 @@
     "lint-staged": "^15.4.3",
     "prettier": "^3.5.2",
     "simple-git-hooks": "^2.11.1",
-    "tsup": "^8.3.6",
+    "tsup": "^8.4.0",
     "typescript": "^5.7.3",
     "vitest": "^2.1.9"
   },
   "peerDependencies": {
     "eslint": ">=8.0.0"
   },
-  "packageManager": "pnpm@9.15.5",
+  "packageManager": "pnpm@9.15.6",
   "publishConfig": {
     "access": "public"
   },
