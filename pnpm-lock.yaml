@@ -22,8 +22,8 @@ importers:
         specifier: ^20.1.5
         version: 20.1.5
       '@types/node':
-        specifier: ^20.17.47
-        version: 20.17.47
+        specifier: ^22.15.21
+        version: 22.15.21
       '@typescript-eslint/rule-tester':
         specifier: ^7.18.0
         version: 7.18.0(@eslint/eslintrc@3.1.0)(eslint@8.57.1)(typescript@5.8.3)
@@ -71,7 +71,7 @@ importers:
         version: 5.8.3
       vitest:
         specifier: ^2.1.9
-        version: 2.1.9(@types/node@20.17.47)(@vitest/ui@2.1.9)
+        version: 2.1.9(@types/node@22.15.21)(@vitest/ui@2.1.9)
 
 packages:
 
@@ -828,6 +828,9 @@ packages:
 
   '@types/node@20.17.47':
     resolution: {integrity: sha512-3dLX0Upo1v7RvUimvxLeXqwrfyKxUINk0EAM83swP2mlSUcwV73sZy8XhNz8bcZ3VbsfQyC/y6jRdL5tgCNpDQ==}
+
+  '@types/node@22.15.21':
+    resolution: {integrity: sha512-EV/37Td6c+MgKAbkcLG6vqZ2zEYHD7bvSrzqqs2RIhbA6w3x+Dqz8MZM3sP6kGTeLrdoOgKZe+Xja7tUB2DNkQ==}
 
   '@types/normalize-package-data@2.4.1':
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
@@ -3722,6 +3725,9 @@ packages:
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
   unified-engine@11.2.0:
     resolution: {integrity: sha512-H9wEDpBSM0cpEUuuYAOIiPzLCVN0pjASZZ6FFNzgzYS/HHzl9tArk/ereOMGtcF8m8vgjzw+HrU3YN7oenT7Ww==}
 
@@ -4498,7 +4504,7 @@ snapshots:
 
   '@types/concat-stream@2.0.3':
     dependencies:
-      '@types/node': 20.17.47
+      '@types/node': 22.15.21
 
   '@types/debug@4.1.8':
     dependencies:
@@ -4540,6 +4546,10 @@ snapshots:
   '@types/node@20.17.47':
     dependencies:
       undici-types: 6.19.8
+
+  '@types/node@22.15.21':
+    dependencies:
+      undici-types: 6.21.0
 
   '@types/normalize-package-data@2.4.1': {}
 
@@ -4829,7 +4839,7 @@ snapshots:
       std-env: 3.8.0
       test-exclude: 7.0.1
       tinyrainbow: 1.2.0
-      vitest: 2.1.9(@types/node@20.17.47)(@vitest/ui@2.1.9)
+      vitest: 2.1.9(@types/node@22.15.21)(@vitest/ui@2.1.9)
     transitivePeerDependencies:
       - supports-color
 
@@ -4840,13 +4850,13 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.9(vite@5.0.11(@types/node@20.17.47))':
+  '@vitest/mocker@2.1.9(vite@5.0.11(@types/node@22.15.21))':
     dependencies:
       '@vitest/spy': 2.1.9
       estree-walker: 3.0.3
       magic-string: 0.30.12
     optionalDependencies:
-      vite: 5.0.11(@types/node@20.17.47)
+      vite: 5.0.11(@types/node@22.15.21)
 
   '@vitest/pretty-format@2.1.9':
     dependencies:
@@ -4876,7 +4886,7 @@ snapshots:
       sirv: 3.0.0
       tinyglobby: 0.2.10
       tinyrainbow: 1.2.0
-      vitest: 2.1.9(@types/node@20.17.47)(@vitest/ui@2.1.9)
+      vitest: 2.1.9(@types/node@22.15.21)(@vitest/ui@2.1.9)
 
   '@vitest/utils@2.1.9':
     dependencies:
@@ -8017,6 +8027,8 @@ snapshots:
 
   undici-types@6.19.8: {}
 
+  undici-types@6.21.0: {}
+
   unified-engine@11.2.0:
     dependencies:
       '@types/concat-stream': 2.0.3
@@ -8149,13 +8161,13 @@ snapshots:
       unist-util-stringify-position: 4.0.0
       vfile-message: 4.0.2
 
-  vite-node@2.1.9(@types/node@20.17.47):
+  vite-node@2.1.9(@types/node@22.15.21):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       es-module-lexer: 1.5.4
       pathe: 1.1.2
-      vite: 5.0.11(@types/node@20.17.47)
+      vite: 5.0.11(@types/node@22.15.21)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -8166,19 +8178,19 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.0.11(@types/node@20.17.47):
+  vite@5.0.11(@types/node@22.15.21):
     dependencies:
       esbuild: 0.19.5
       postcss: 8.4.33
       rollup: 4.24.2
     optionalDependencies:
-      '@types/node': 20.17.47
+      '@types/node': 22.15.21
       fsevents: 2.3.3
 
-  vitest@2.1.9(@types/node@20.17.47)(@vitest/ui@2.1.9):
+  vitest@2.1.9(@types/node@22.15.21)(@vitest/ui@2.1.9):
     dependencies:
       '@vitest/expect': 2.1.9
-      '@vitest/mocker': 2.1.9(vite@5.0.11(@types/node@20.17.47))
+      '@vitest/mocker': 2.1.9(vite@5.0.11(@types/node@22.15.21))
       '@vitest/pretty-format': 2.1.9
       '@vitest/runner': 2.1.9
       '@vitest/snapshot': 2.1.9
@@ -8194,11 +8206,11 @@ snapshots:
       tinyexec: 0.3.1
       tinypool: 1.0.1
       tinyrainbow: 1.2.0
-      vite: 5.0.11(@types/node@20.17.47)
-      vite-node: 2.1.9(@types/node@20.17.47)
+      vite: 5.0.11(@types/node@22.15.21)
+      vite-node: 2.1.9(@types/node@22.15.21)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 20.17.47
+      '@types/node': 22.15.21
       '@vitest/ui': 2.1.9(vitest@2.1.9)
     transitivePeerDependencies:
       - less
