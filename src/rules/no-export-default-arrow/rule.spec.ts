@@ -1,24 +1,26 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
-import dedent from 'dedent';
-import { afterAll, describe, it } from 'vitest';
-import { noExportDefaultArrowRule, RULE_NAME } from './no-export-default-arrow';
+import { RuleTester } from "@typescript-eslint/rule-tester";
+
+import dedent from "dedent";
+import { afterAll, describe, it } from "vitest";
+
+import { noExportDefaultArrowRule, RULE_NAME } from "./no-export-default-arrow/rule";
 
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
 RuleTester.it = it;
 
 const ruleTester = new RuleTester({
-  parser: '@typescript-eslint/parser',
+	parser: "@typescript-eslint/parser",
 
-  parserOptions: {
-    ecmaFeatures: { jsx: true },
-  },
+	parserOptions: {
+		ecmaFeatures: { jsx: true },
+	},
 });
 
 ruleTester.run(RULE_NAME, noExportDefaultArrowRule, {
-  invalid: [
-    {
-      code: dedent`
+	invalid: [
+		{
+			code: dedent`
         import { useState } from 'react'
       
         export default () => {
@@ -32,11 +34,11 @@ ruleTester.run(RULE_NAME, noExportDefaultArrowRule, {
         }
       `,
 
-      errors: [{ messageId: 'disallowExportDefaultArrow' }],
+			errors: [{ messageId: "disallowExportDefaultArrow" }],
 
-      filename: 'useForceUpdate.ts',
+			filename: "useForceUpdate.ts",
 
-      output: dedent`
+			output: dedent`
         import { useState } from 'react'
       
         const useForceUpdate = () => {
@@ -51,30 +53,30 @@ ruleTester.run(RULE_NAME, noExportDefaultArrowRule, {
 
         export default useForceUpdate
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         export default () => {}
 
         export const foo = () => 'foo'
       `,
 
-      errors: [{ messageId: 'disallowExportDefaultArrow' }],
+			errors: [{ messageId: "disallowExportDefaultArrow" }],
 
-      filename: 'use-mouse.tsx',
+			filename: "use-mouse.tsx",
 
-      output: dedent`
+			output: dedent`
         const useMouse = () => {}
 
         export const foo = () => 'foo'
 
         export default useMouse
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         export default () => 1
 
         // line comment
@@ -82,11 +84,11 @@ ruleTester.run(RULE_NAME, noExportDefaultArrowRule, {
         /* block comment */
       `,
 
-      errors: [{ messageId: 'disallowExportDefaultArrow' }],
+			errors: [{ messageId: "disallowExportDefaultArrow" }],
 
-      filename: 'just_for_fun.js',
+			filename: "just_for_fun.js",
 
-      output: dedent`
+			output: dedent`
         const justForFun = () => 1
 
         // line comment
@@ -95,10 +97,10 @@ ruleTester.run(RULE_NAME, noExportDefaultArrowRule, {
 
         export default justForFun
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         export default () => {
           return (
             <html>
@@ -109,11 +111,11 @@ ruleTester.run(RULE_NAME, noExportDefaultArrowRule, {
         }
       `,
 
-      errors: [{ messageId: 'disallowExportDefaultArrow' }],
+			errors: [{ messageId: "disallowExportDefaultArrow" }],
 
-      filename: 'layout.tsx',
+			filename: "layout.tsx",
 
-      output: dedent`
+			output: dedent`
         const Layout = () => {
           return (
             <html>
@@ -125,25 +127,25 @@ ruleTester.run(RULE_NAME, noExportDefaultArrowRule, {
 
         export default Layout
       `,
-    },
+		},
 
-    {
-      code: 'export default () => <></>',
+		{
+			code: "export default () => <></>",
 
-      errors: [{ messageId: 'disallowExportDefaultArrow' }],
+			errors: [{ messageId: "disallowExportDefaultArrow" }],
 
-      filename: 'page.tsx',
+			filename: "page.tsx",
 
-      output: dedent`
+			output: dedent`
         const Page = () => <></>
 
         export default Page
       `,
-    },
-  ],
+		},
+	],
 
-  valid: [
-    dedent`
+	valid: [
+		dedent`
       const foo = () => {
         return 'foo'
       }
@@ -151,7 +153,7 @@ ruleTester.run(RULE_NAME, noExportDefaultArrowRule, {
       export default foo
     `,
 
-    'const now = () => Date.now()',
-    'export const useQuery = () => {}',
-  ],
+		"const now = () => Date.now()",
+		"export const useQuery = () => {}",
+	],
 });

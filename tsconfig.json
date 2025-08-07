@@ -1,10 +1,23 @@
 {
-  "compilerOptions": {
-    "allowJs": true,
-    "jsx": "preserve",
-    "noEmit": true,
-    "resolveJsonModule": true
-  },
-
-  "extends": "@tsconfig/node20/tsconfig.json"
+	"compilerOptions": {
+		"target": "ESNext",
+		"lib": ["ESNext"],
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"resolveJsonModule": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"noUncheckedIndexedAccess": true,
+		"useUnknownInCatchVariables": true,
+		"noEmit": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"verbatimModuleSyntax": true,
+		"skipDefaultLibCheck": true,
+		"skipLibCheck": true
+	},
+	"include": ["**/*/*.*"],
+	"exclude": ["./fixtures/**/*.*", "./_fixtures/**/*.*"]
 }

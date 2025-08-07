@@ -1,100 +1,93 @@
 {
-  "name": "eslint-plugin-arrow-return-style",
-  "version": "1.3.1",
-  "description": "Enforce arrow function return style and automatically fix it",
-  "keywords": [
-    "arrow-body-style",
-    "arrow-return-style",
-    "arrow-function"
-  ],
-  "repository": {
-    "url": "https://github.com/u3u/eslint-plugin-arrow-return-style.git"
-  },
-  "license": "MIT",
-  "author": "u3u <qwq@qwq.cat> (https://github.com/u3u)",
-  "sideEffects": false,
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      }
-    }
-  },
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/*",
-        "./dist/index.d.ts"
-      ]
-    }
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsup && fix-tsup-cjs",
-    "format": "prettier --write .",
-    "lint": "eslint --fix .",
-    "prepare": "pnpm build",
-    "test": "vitest --ui --coverage.enabled --coverage.all=false",
-    "update:eslint-docs": "pnpm build && eslint-doc-generator"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "npx lint-staged --concurrent false"
-  },
-  "lint-staged": {
-    "*.{js,cjs,mjs,jsx,ts,tsx,md}": [
-      "eslint --fix"
-    ],
-    "*": [
-      "prettier --write --ignore-unknown"
-    ]
-  },
-  "dependencies": {
-    "@typescript-eslint/utils": "^7.18.0",
-    "scule": "^1.3.0"
-  },
-  "devDependencies": {
-    "@total-typescript/ts-reset": "^0.6.1",
-    "@tsconfig/node20": "^20.1.6",
-    "@types/node": "^20.19.9",
-    "@typescript-eslint/rule-tester": "^7.18.0",
-    "@u3u/eslint-config": "^2.15.2",
-    "@u3u/prettier-config": "^5.2.0",
-    "@vitest/coverage-v8": "^2.1.9",
-    "@vitest/ui": "^2.1.9",
-    "dedent": "^1.6.0",
-    "eslint": "^8.57.1",
-    "eslint-doc-generator": "^1.7.1",
-    "eslint-plugin-arrow-return-style": "link:",
-    "fix-tsup-cjs": "^1.2.0",
-    "lint-staged": "^15.5.2",
-    "prettier": "^3.6.2",
-    "simple-git-hooks": "^2.13.1",
-    "tsup": "^8.5.0",
-    "typescript": "^5.9.2",
-    "vitest": "^2.1.9"
-  },
-  "peerDependencies": {
-    "eslint": ">=8.0.0"
-  },
-  "packageManager": "pnpm@9.15.9",
-  "publishConfig": {
-    "access": "public"
-  },
-  "pnpm": {
-    "updateConfig": {
-      "ignoreDependencies": [
-        "@types/node"
-      ]
-    }
-  }
+	"name": "eslint-plugin-arrow-return-style-x",
+	"version": "1.0.0-alpha.0",
+	"description": "Enforce arrow function return style and automatically fix it",
+	"keywords": ["arrow-body-style", "arrow-return-style", "arrow-function"],
+	"repository": {
+		"url": "https://github.com/christopher-buss/eslint-plugin-arrow-return-style-x.git",
+		"type": "git"
+	},
+	"license": "MIT",
+	"author": "Christopher Buss <christopher.buss@pm.me> (https://github.com/christopher-buss)",
+	"contributors": ["u3u <qwq@qwq.cat> (https://github.com/u3u)"],
+	"type": "module",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/index.d.mts",
+				"default": "./dist/index.mjs"
+			},
+			"require": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			}
+		}
+	},
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"typesVersions": {
+		"*": {
+			"*": ["./dist/*", "./dist/index.d.ts"]
+		}
+	},
+	"files": ["dist"],
+	"scripts": {
+		"build": "nr generate:types && tsdown --clean --dts",
+		"dev": "tsdown --stub",
+		"eslint-docs": "eslint-doc-generator",
+		"generate:types": "tsx scripts/generate-types.ts",
+		"lint": "eslint --cache",
+		"prepare": "simple-git-hooks",
+		"prepublishOnly": "nr build",
+		"release": "bumpp",
+		"start": "tsx src/index.ts",
+		"test": "vitest",
+		"typecheck": "tsc --noEmit"
+	},
+	"simple-git-hooks": {
+		"pre-commit": "npx lint-staged --concurrent false"
+	},
+	"lint-staged": {
+		"*.{js,cjs,mjs,jsx,ts,tsx,md}": ["eslint --fix"],
+		"*": ["prettier --write --ignore-unknown"]
+	},
+	"dependencies": {
+		"@typescript-eslint/type-utils": "catalog:cli",
+		"@typescript-eslint/utils": "catalog:cli"
+	},
+	"devDependencies": {
+		"@antfu/ni": "catalog:cli",
+		"@isentinel/eslint-config": "catalog:cli",
+		"@types/node": "catalog:types",
+		"@typescript-eslint/eslint-plugin": "catalog:cli",
+		"@typescript-eslint/parser": "catalog:cli",
+		"@vitest/eslint-plugin": "catalog:",
+		"bumpp": "catalog:cli",
+		"eslint": "catalog:cli",
+		"eslint-doc-generator": "catalog:utils",
+		"eslint-plugin-eslint-plugin": "catalog:testing",
+		"eslint-plugin-pnpm": "catalog:cli",
+		"eslint-vitest-rule-tester": "catalog:testing",
+		"jiti": "catalog:cli",
+		"lint-staged": "catalog:cli",
+		"publint": "catalog:testing",
+		"simple-git-hooks": "catalog:cli",
+		"ts-api-utils": "catalog:cli",
+		"tsdown": "catalog:cli",
+		"tsx": "catalog:cli",
+		"typescript": "catalog:cli",
+		"unplugin-unused": "catalog:testing",
+		"vitest": "catalog:testing"
+	},
+	"peerDependencies": {
+		"eslint": ">=9.10.0"
+	},
+	"packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748",
+	"engines": {
+		"node": ">=20.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
 }

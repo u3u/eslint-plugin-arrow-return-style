@@ -1,23 +1,27 @@
-import '@total-typescript/ts-reset';
-import type { Rule } from 'eslint';
-import { name, version } from '../package.json';
-import recommended from './configs/recommended';
-import { arrowReturnStyleRule, RULE_NAME as arrowReturnStyleRuleName } from './rules/arrow-return-style';
-import { noExportDefaultArrowRule, RULE_NAME as noExportDefaultArrowRuleName } from './rules/no-export-default-arrow';
-import { definePlugin } from './utils';
+import "@total-typescript/ts-reset";
 
-export default definePlugin({
-  configs: {
-    recommended,
-  },
+import type { Linter } from "eslint";
 
-  meta: {
-    name,
-    version,
-  },
+import { configs } from "./configs";
+import { plugin } from "./plugin";
 
-  rules: {
-    [arrowReturnStyleRuleName]: arrowReturnStyleRule as unknown as Rule.RuleModule,
-    [noExportDefaultArrowRuleName]: noExportDefaultArrowRule as unknown as Rule.RuleModule,
-  },
-});
+// Default export for ESLint v9+ (flat config)
+export default {
+	...plugin,
+	configs,
+};
+
+// Named exports for ESLint v8 (legacy config)
+export const { rules } = plugin;
+
+export type RuleOptions = {
+	[K in keyof RuleDefinitions]: RuleDefinitions[K]["defaultOptions"];
+};
+
+export type Rules = {
+	[K in keyof RuleOptions]: Linter.RuleEntry<RuleOptions[K]>;
+};
+
+type RuleDefinitions = typeof plugin.rules;
+
+export { configs } from "./configs";

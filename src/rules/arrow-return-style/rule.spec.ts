@@ -1,186 +1,188 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
-import dedent from 'dedent';
-import { afterAll, describe, it } from 'vitest';
-import { arrowReturnStyleRule, RULE_NAME } from './arrow-return-style';
+import { RuleTester } from "@typescript-eslint/rule-tester";
+
+import dedent from "dedent";
+import { afterAll, describe, it } from "vitest";
+
+import { arrowReturnStyleRule, RULE_NAME } from "./arrow-return-style/arrow-return-style";
 
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
 RuleTester.it = it;
 
 const ruleTester = new RuleTester({
-  parser: '@typescript-eslint/parser',
+	parser: "@typescript-eslint/parser",
 
-  parserOptions: {
-    ecmaFeatures: { jsx: true },
-  },
+	parserOptions: {
+		ecmaFeatures: { jsx: true },
+	},
 });
 
 ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
-  invalid: [
-    {
-      code: dedent`
+	invalid: [
+		{
+			code: dedent`
         const UDimTemporary = (value: UDim, rem: number): UDim => new UDim(value.Scale, value.Offset * rem);
       `,
 
-      errors: [{ messageId: 'useExplicitReturn' }],
+			errors: [{ messageId: "useExplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const UDimTemporary = (value: UDim, rem: number): UDim => { return new UDim(value.Scale, value.Offset * rem) };
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         const obj = {
           UDimTemporary11111111111: (value: UDim, rem: number): UDim =>
             new UDim(value.Scale, value.Offset * rem),
         };
       `,
 
-      errors: [{ messageId: 'useExplicitReturn' }],
+			errors: [{ messageId: "useExplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const obj = {
           UDimTemporary11111111111: (value: UDim, rem: number): UDim =>
             { return new UDim(value.Scale, value.Offset * rem) },
         };
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         const isVariableDeclaration = (node: TSESTree.Node | null | undefined): node is TSESTree.VariableDeclaration =>
           node?.type === AST_NODE_TYPES.VariableDeclaration;
       `,
 
-      errors: [{ messageId: 'useExplicitReturn' }],
+			errors: [{ messageId: "useExplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const isVariableDeclaration = (node: TSESTree.Node | null | undefined): node is TSESTree.VariableDeclaration =>
           { return node?.type === AST_NODE_TYPES.VariableDeclaration };
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         const returnValues = blockBody
           .filter((node): node is TSESTree.ReturnStatement => node.type === AST_NODE_TYPES.ReturnStatement)
           .map((node) => node.argument)
           .filter(Boolean);
       `,
 
-      errors: [{ messageId: 'useExplicitReturn' }],
+			errors: [{ messageId: "useExplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const returnValues = blockBody
           .filter((node): node is TSESTree.ReturnStatement => { return node.type === AST_NODE_TYPES.ReturnStatement })
           .map((node) => node.argument)
           .filter(Boolean);
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         const delay = () =>
           new Promise((resolve) => {
             setTimeout(resolve, 1000)
           })
       `,
 
-      errors: [{ messageId: 'useExplicitReturn' }],
+			errors: [{ messageId: "useExplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const delay = () =>
           { return new Promise((resolve) => {
             setTimeout(resolve, 1000)
           }) }
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         const foo = () => {
           return 'foo'
         }
       `,
 
-      errors: [{ messageId: 'useImplicitReturn' }],
+			errors: [{ messageId: "useImplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const foo = () => 
           'foo'\n
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         Array.from({ length: 10 }).map((_, i) => {
           return i + 1
         })
       `,
 
-      errors: [{ messageId: 'useImplicitReturn' }],
+			errors: [{ messageId: "useImplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         Array.from({ length: 10 }).map((_, i) => 
           i + 1
         )
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         const obj = () => {
           return { name: '' }
         }
       `,
 
-      errors: [{ messageId: 'useImplicitReturn' }],
+			errors: [{ messageId: "useImplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const obj = () => 
           ({ name: '' })\n
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         const data = () => ({
           name: ''
         })
       `,
 
-      errors: [{ messageId: 'useExplicitReturn' }],
+			errors: [{ messageId: "useExplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const data = () => { return {
           name: ''
         } }
       `,
-    },
+		},
 
-    {
-      code: 'export const defineConfig = <T extends Linter.Config>(config: T) => config',
-      errors: [{ messageId: 'useExplicitReturn' }],
-      output: 'export const defineConfig = <T extends Linter.Config>(config: T) => { return config }',
-    },
+		{
+			code: "export const defineConfig = <T extends Linter.Config>(config: T) => config",
+			errors: [{ messageId: "useExplicitReturn" }],
+			output: "export const defineConfig = <T extends Linter.Config>(config: T) => { return config }",
+		},
 
-    {
-      code: 'const Div = () => <><div /></>',
-      errors: [{ messageId: 'useExplicitReturn' }],
-      options: [{ jsxAlwaysUseExplicitReturn: true }],
-      output: 'const Div = () => { return <><div /></> }',
-    },
+		{
+			code: "const Div = () => <><div /></>",
+			errors: [{ messageId: "useExplicitReturn" }],
+			options: [{ jsxAlwaysUseExplicitReturn: true }],
+			output: "const Div = () => { return <><div /></> }",
+		},
 
-    {
-      code: 'export const Div = () => <><div /></>',
-      errors: [{ messageId: 'useExplicitReturn' }],
-      options: [{ namedExportsAlwaysUseExplicitReturn: true }],
-      output: 'export const Div = () => { return <><div /></> }',
-    },
+		{
+			code: "export const Div = () => <><div /></>",
+			errors: [{ messageId: "useExplicitReturn" }],
+			options: [{ namedExportsAlwaysUseExplicitReturn: true }],
+			output: "export const Div = () => { return <><div /></> }",
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         const FC = () =>
           <Foo
           // d=""
@@ -191,9 +193,9 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
         />
       `,
 
-      errors: [{ messageId: 'useExplicitReturn' }],
+			errors: [{ messageId: "useExplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const FC = () =>
           { return <Foo
           // d=""
@@ -203,109 +205,109 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
           bar={[]}
         /> }
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         export const createRule = ESLintUtils.RuleCreator(
           (rule) => \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\`
         )
       `,
 
-      errors: [{ messageId: 'useExplicitReturn' }],
+			errors: [{ messageId: "useExplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         export const createRule = ESLintUtils.RuleCreator(
           (rule) => { return \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\` }
         )
       `,
-    },
+		},
 
-    {
-      code: 'const render = () => (<div />)',
-      errors: [{ messageId: 'useExplicitReturn' }],
-      options: [{ jsxAlwaysUseExplicitReturn: true }],
-      output: 'const render = () => { return <div /> }',
-    },
+		{
+			code: "const render = () => (<div />)",
+			errors: [{ messageId: "useExplicitReturn" }],
+			options: [{ jsxAlwaysUseExplicitReturn: true }],
+			output: "const render = () => { return <div /> }",
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         const fn = () =>
           /* block comment */
           1
       `,
 
-      errors: [{ messageId: 'useExplicitReturn' }],
+			errors: [{ messageId: "useExplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const fn = () => {
           /* block comment */
           return 1
         }
       `,
-    },
+		},
 
-    {
-      code: dedent`
+		{
+			code: dedent`
         const test = () =>
           // line comment
           ({ name: 'test' })
       `,
 
-      errors: [{ messageId: 'useExplicitReturn' }],
+			errors: [{ messageId: "useExplicitReturn" }],
 
-      output: dedent`
+			output: dedent`
         const test = () => {
           // line comment
           return { name: 'test' }
         }
       `,
-    },
-  ],
+		},
+	],
 
-  valid: [
-    'const t = () => Date.now()',
-    'const fn = () => { return }',
+	valid: [
+		"const t = () => Date.now()",
+		"const fn = () => { return }",
 
-    'Array.from({ length: 10 }).map((_, i) => i + 1)',
+		"Array.from({ length: 10 }).map((_, i) => i + 1)",
 
-    {
-      code: 'const Div = () => <><div /></>',
-      options: [{ jsxAlwaysUseExplicitReturn: false }],
-    },
+		{
+			code: "const Div = () => <><div /></>",
+			options: [{ jsxAlwaysUseExplicitReturn: false }],
+		},
 
-    dedent`
+		dedent`
       const bar = () => {
         // line comment
         return 'bar'
       }
     `,
 
-    dedent`
+		dedent`
       const fn = async () => {
         await delay(300)
         return 'fn'
       }
     `,
 
-    dedent`
+		dedent`
       export const getUser = async () => {
         return { name: 'admin' }
       }
     `,
 
-    {
-      code: "export const getUser = async () => ({ name: 'admin' })",
-      options: [{ namedExportsAlwaysUseExplicitReturn: false }],
-    },
+		{
+			code: "export const getUser = async () => ({ name: 'admin' })",
+			options: [{ namedExportsAlwaysUseExplicitReturn: false }],
+		},
 
-    dedent`
+		dedent`
       const isMaxLen = (node = arrowRoot) => {
         return node.loc.end.column - node.loc.start.column >= maxLen;
       };
     `,
 
-    dedent`
+		dedent`
       const isVariableDeclaration = (
         node: TSESTree.Node | null | undefined,
       ): node is TSESTree.VariableDeclaration => {
@@ -313,10 +315,10 @@ ruleTester.run(RULE_NAME, arrowReturnStyleRule, {
       };
     `,
 
-    dedent`
+		dedent`
       const obj = {
         temporary: (v: UDim, rem = 0) => new UDim(v.Scale, v.Offset * rem),
       };
     `,
-  ],
+	],
 });

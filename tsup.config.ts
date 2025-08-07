@@ -1,30 +1,19 @@
-import dedent from 'dedent';
-import { defineConfig } from 'tsup';
+// cspell:ignore publint
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  banner: ({ format }) => {
-    if (format !== 'esm') return;
-
-    return {
-      js: dedent`
-        import { createRequire } from 'node:module';
-        const require = createRequire(import.meta.url);\n
-      `,
-    };
-  },
-
-  clean: true,
-
-  dts: {
-    compilerOptions: {
-      module: 'esnext',
-      moduleResolution: 'node',
-    },
-
-    resolve: true,
-  },
-
-  entry: ['src/index.ts'],
-  format: ['cjs', 'esm'],
-  shims: true,
+	clean: true,
+	entry: ["src/index.ts"],
+	external: ["@typescript-eslint/utils", "@typescript-eslint/type-utils", "typescript"],
+	fixedExtension: true,
+	format: ["esm"],
+	noExternal: ["ts-api-utils"],
+	onSuccess() {
+		console.info("🙏 Build succeeded!");
+	},
+	publint: true,
+	shims: true,
+	unused: {
+		level: "error",
+	},
 });
