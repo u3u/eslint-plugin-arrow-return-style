@@ -6,8 +6,6 @@ import {
 	type TSESTree,
 } from "@typescript-eslint/utils";
 
-import assert from "node:assert";
-
 import { createEslintRule } from "../../util";
 
 type Options = [
@@ -30,12 +28,64 @@ const messages = {
 	[IMPLICIT_RETURN_VIOLATION]: "Use explicit return for multiline arrow function bodies.",
 };
 
+interface ExplicitReturnFixContext {
+	arrowToken: TSESTree.Token;
+	body: TSESTree.ArrowFunctionExpression["body"];
+	fixer: TSESLint.RuleFixer;
+	node: TSESTree.ArrowFunctionExpression;
+	sourceCode: TSESLint.SourceCode;
+}
+
 interface ImplicitReturnFixOptions {
 	closingBrace: TSESTree.Token;
 	openingBrace: TSESTree.Token;
 	returnStatement: TSESTree.ReturnStatement;
 	returnValue: TSESTree.Expression;
 	sourceCode: TSESLint.SourceCode;
+}
+
+function adjustJsxIndentation(bodyText: string): string {
+	const bodyLines = bodyText.split("\n");
+	if (bodyLines.length <= 1) {
+		return bodyText;
+	}
+
+	const adjustedLines = bodyLines.map((line, index) => {
+		if (index === 0) {
+			return line;
+		}
+
+		// First line (opening tag) doesn't need adjustment
+		// Add 2 spaces to existing indentation for JSX content (including closing tags)
+		return line.trim() === "" ? line : "  " + line;
+	});
+
+	return adjustedLines.join("\n");
+}
+
+function calculateImplicitLength(
+	returnValue: TSESTree.Expression,
+	sourceCode: TSESLint.SourceCode,
+	node: TSESTree.ArrowFunctionExpression,
+): number {
+	const returnValueText = sourceCode.getText(returnValue);
+	const arrowToken = getArrowToken(node, sourceCode);
+	const beforeArrow = arrowToken ? sourceCode.text.substring(0, arrowToken.range[1]) : "";
+	const lastLineBeforeArrow = beforeArrow.split("\n").pop() ?? "";
+
+	// For multiline arrays/objects, calculate the single-line length
+	let estimatedSingleLineText = returnValueText;
+	if (
+		isMultiline(returnValue) &&
+		(returnValue.type === AST_NODE_TYPES.ArrayExpression ||
+			returnValue.type === AST_NODE_TYPES.ObjectExpression)
+	) {
+		// Convert to single line for estimation
+		estimatedSingleLineText = convertMultilineToSingleLine(returnValueText);
+	}
+
+	// +1 for space after =>
+	return lastLineBeforeArrow.length + 1 + estimatedSingleLineText.length;
 }
 
 function commentsExistBetweenTokens(
@@ -45,6 +95,17 @@ function commentsExistBetweenTokens(
 ): boolean {
 	const arrowToken = getArrowToken(node, sourceCode);
 	return Boolean(arrowToken && sourceCode.commentsExistBetween(arrowToken, body));
+}
+
+function convertMultilineToSingleLine(returnValue: string): string {
+	return returnValue
+		.replace(/\s+/g, " ")
+		.replace(/,\s*([}\]])/g, "$1")
+		.replace(/^\s+|\s+$/g, "")
+		.replace(/\[\s+/g, "[")
+		.replace(/\s+\]/g, "]")
+		.replace(/{\s+/g, "{")
+		.replace(/\s+}/g, "}");
 }
 
 function create(
@@ -64,54 +125,73 @@ function create(
 function createExplicitReturnText(
 	body: TSESTree.ArrowFunctionExpression["body"],
 	sourceCode: TSESLint.SourceCode,
+	node: TSESTree.ArrowFunctionExpression,
 ): string {
-	const bodyText = sourceCode.getText(body);
+	let returnValue = normalizeParentheses(body, sourceCode);
 
-	const firstBodyToken = sourceCode.getFirstToken(body);
-	const lastBodyToken = sourceCode.getLastToken(body);
-
+	// Convert multiline arrays and objects to single-line format for explicit return
 	if (
-		firstBodyToken &&
-		lastBodyToken &&
-		ASTUtils.isOpeningParenToken(firstBodyToken) &&
-		ASTUtils.isClosingParenToken(lastBodyToken)
+		isMultiline(body) &&
+		(body.type === AST_NODE_TYPES.ArrayExpression ||
+			body.type === AST_NODE_TYPES.ObjectExpression)
 	) {
-		return `{ return ${bodyText.slice(1, -1)} }`;
+		returnValue = convertMultilineToSingleLine(returnValue);
 	}
 
-	return `{ return ${bodyText} }`;
+	// Handle JSX indentation adjustments
+	if (isJsxElement(body) && isMultiline(body)) {
+		const bodyText = sourceCode.getText(body);
+		returnValue = adjustJsxIndentation(bodyText);
+	}
+
+	// Determine base indentation from the arrow function's line
+	const arrowLine = sourceCode.lines[node.loc.start.line - 1];
+	const baseIndentMatch = arrowLine?.match(/^(\s*)/);
+	const baseIndent = baseIndentMatch?.[1] ?? "";
+
+	const returnIndent = determineReturnIndentation(body, node, baseIndent);
+
+	// For explicit return conversion, create the block statement
+	return `{\n${returnIndent}return ${returnValue};\n${baseIndent}}`;
 }
 
 function createImplicitReturnFix(
 	options: ImplicitReturnFixOptions,
 ): (fixer: TSESLint.RuleFixer) => Array<TSESLint.RuleFix> {
-	const { closingBrace, openingBrace, returnStatement, returnValue, sourceCode } = options;
+	const { closingBrace, openingBrace, returnValue, sourceCode } = options;
 	return (fixer) => {
 		const returnText = sourceCode.getText(returnValue);
 		const replacement = isObjectLiteral(returnValue) ? `(${returnText})` : returnText;
 
-		const returnLine = sourceCode.lines[returnStatement.loc.start.line - 1];
-		assert(returnLine !== undefined, "Return line should not be undefined");
-		const indentMatch = returnLine.match(/^(\s*)/);
-		const indent = indentMatch ? indentMatch[1] : "";
-
-		const textAfterClosingBrace = sourceCode.text.substring(closingBrace.range[1]);
-		const nextNonWhitespaceMatch = textAfterClosingBrace.match(/^(\s*)(\S)/);
-		const hasFollowingToken = nextNonWhitespaceMatch && nextNonWhitespaceMatch[2] !== "\n";
-
-		let replacementText = `\n${indent}${replacement}`;
-		if (hasFollowingToken === true) {
-			const openingBraceLine = sourceCode.lines[openingBrace.loc.start.line - 1];
-			assert(openingBraceLine !== undefined, "Opening brace line should not be undefined");
-			const openingBraceIndentMatch = openingBraceLine.match(/^(\s*)/);
-			const openingBraceIndent = openingBraceIndentMatch ? openingBraceIndentMatch[1] : "";
-			replacementText += `\n${openingBraceIndent}`;
-		}
-
+		// For implicit returns, we want single-line format: () => value
 		return [
-			fixer.replaceTextRange([openingBrace.range[0], closingBrace.range[1]], replacementText),
+			fixer.replaceTextRange([openingBrace.range[0], closingBrace.range[1]], replacement),
 		];
 	};
+}
+
+function determineReturnIndentation(
+	body: TSESTree.ArrowFunctionExpression["body"],
+	node: TSESTree.ArrowFunctionExpression,
+	baseIndent: string,
+): string {
+	if (isJsxElement(body)) {
+		if (isMultiline(body)) {
+			return baseIndent === "" ? "  " : baseIndent + "  ";
+		}
+
+		return baseIndent + "\t";
+	}
+
+	if (isMultiline(body) && baseIndent === "") {
+		return "  ";
+	}
+
+	if (node.parent.type === AST_NODE_TYPES.Property) {
+		return "\t";
+	}
+
+	return getMethodChainIndentation(node, body, baseIndent);
 }
 
 function generateReturnCommentFixes(
@@ -172,8 +252,41 @@ function getBlockStatementTokens(
 	};
 }
 
+function getExplicitReturnMessageId(body: TSESTree.ArrowFunctionExpression["body"]): MessageIds {
+	return isMultiline(body) &&
+		(body.type === AST_NODE_TYPES.ArrayExpression ||
+			body.type === AST_NODE_TYPES.ObjectExpression)
+		? IMPLICIT_RETURN_VIOLATION
+		: EXPLICIT_RETURN_VIOLATION;
+}
+
 function getLength(node: TSESTree.NodeOrTokenData): number {
 	return node.loc.end.column - node.loc.start.column;
+}
+
+function getMethodChainIndentation(
+	node: TSESTree.ArrowFunctionExpression,
+	body: TSESTree.ArrowFunctionExpression["body"],
+	baseIndent: string,
+): string {
+	let parent: TSESTree.Node | undefined = node.parent;
+
+	while (parent) {
+		if (parent.type === AST_NODE_TYPES.CallExpression) {
+			const { callee } = parent;
+			if (callee.type === AST_NODE_TYPES.MemberExpression) {
+				const needsExtraIndent =
+					(body.type === AST_NODE_TYPES.ArrayExpression ||
+						body.type === AST_NODE_TYPES.ObjectExpression) &&
+					isMultiline(body);
+				return needsExtraIndent ? baseIndent + "\t" : "\t";
+			}
+		}
+
+		({ parent } = parent);
+	}
+
+	return baseIndent + "\t";
 }
 
 function getRuleOptions(context: TSESLint.RuleContext<MessageIds, Options>): {
@@ -226,6 +339,37 @@ function handleBlockStatement(
 	processImplicitReturn(context, node, returnStatement, returnValue);
 }
 
+function handleExplicitReturnFix(context: ExplicitReturnFixContext): Array<TSESLint.RuleFix> {
+	const { arrowToken, body, fixer, node, sourceCode } = context;
+	const returnText = createExplicitReturnText(body, sourceCode, node);
+	const tokenAfterBody = sourceCode.getTokenAfter(body);
+	const tokenBeforeBody = sourceCode.getTokenBefore(body);
+
+	const isWrappedInParens =
+		tokenBeforeBody &&
+		tokenAfterBody &&
+		ASTUtils.isOpeningParenToken(tokenBeforeBody) &&
+		ASTUtils.isClosingParenToken(tokenAfterBody);
+
+	if (
+		tokenAfterBody &&
+		(ASTUtils.isSemicolonToken(tokenAfterBody) ||
+			tokenAfterBody.value === "," ||
+			Boolean(isWrappedInParens))
+	) {
+		// Replace from arrow to after the token (semicolon, comma, or closing paren for wrapped expressions)
+		return [
+			fixer.replaceTextRange(
+				[arrowToken.range[1], tokenAfterBody.range[1]],
+				` ${returnText}`,
+			),
+		];
+	}
+
+	// Replace from arrow to end of body
+	return [fixer.replaceTextRange([arrowToken.range[1], body.range[1]], ` ${returnText}`)];
+}
+
 function handleExpressionBody(
 	context: Readonly<TSESLint.RuleContext<MessageIds, Options>>,
 	node: TSESTree.ArrowFunctionExpression,
@@ -233,6 +377,8 @@ function handleExpressionBody(
 	if (shouldUseExplicitReturn(context, node)) {
 		reportExplicitReturn(context, node);
 	}
+	// No else case needed - if it doesn't need explicit return and isn't multiline,
+	// then it's already in the correct implicit form
 }
 
 function handleParenthesesRemoval(
@@ -288,6 +434,26 @@ function isVariableDeclaration(node?: TSESTree.Node): node is TSESTree.VariableD
 	return node?.type === AST_NODE_TYPES.VariableDeclaration;
 }
 
+function normalizeParentheses(
+	body: TSESTree.ArrowFunctionExpression["body"],
+	sourceCode: TSESLint.SourceCode,
+): string {
+	const bodyText = sourceCode.getText(body);
+	const firstBodyToken = sourceCode.getFirstToken(body);
+	const lastBodyToken = sourceCode.getLastToken(body);
+
+	if (
+		firstBodyToken &&
+		lastBodyToken &&
+		ASTUtils.isOpeningParenToken(firstBodyToken) &&
+		ASTUtils.isClosingParenToken(lastBodyToken)
+	) {
+		return bodyText.slice(1, -1);
+	}
+
+	return bodyText;
+}
+
 // eslint-disable-next-line max-lines-per-function -- Function is large due to multiple checks and fixes
 function processImplicitReturn(
 	context: TSESLint.RuleContext<MessageIds, Options>,
@@ -340,20 +506,21 @@ function reportExplicitReturn(
 
 	context.report({
 		fix: (fixer) => {
-			const fixes: Array<TSESLint.RuleFix> = [];
-
-			fixes.push(...handleParenthesesRemoval(fixer, firstToken, lastToken));
-
 			if (commentsExist) {
-				fixes.push(...generateReturnCommentFixes(fixer, node, body, sourceCode));
-			} else {
-				const returnText = createExplicitReturnText(body, sourceCode);
-				fixes.push(fixer.replaceText(body, returnText));
+				return [
+					...handleParenthesesRemoval(fixer, firstToken, lastToken),
+					...generateReturnCommentFixes(fixer, node, body, sourceCode),
+				];
 			}
 
-			return fixes;
+			const arrowToken = getArrowToken(node, sourceCode);
+			if (!arrowToken) {
+				return [];
+			}
+
+			return handleExplicitReturnFix({ arrowToken, body, fixer, node, sourceCode });
 		},
-		messageId: EXPLICIT_RETURN_VIOLATION,
+		messageId: getExplicitReturnMessageId(body),
 		node,
 	});
 }
@@ -364,15 +531,26 @@ function shouldSkipImplicitReturn(
 	returnValue: TSESTree.Expression,
 ): boolean {
 	const { sourceCode } = context;
-	const arrowRoot = getArrowRoot(node, node.parent);
 
 	const { jsxAlwaysUseExplicitReturn, maxLength, namedExportsAlwaysExplicit } =
 		getRuleOptions(context);
 
+	// Check the length of the line where the arrow function starts
+	const arrowFunctionLine = sourceCode.lines[node.loc.start.line - 1];
+	const currentLineLength = arrowFunctionLine?.length ?? 0;
+
+	// If the current line is already at or over the limit, don't convert to implicit
+	if (currentLineLength >= maxLength) {
+		return true;
+	}
+
+	const estimatedImplicitLength = calculateImplicitLength(returnValue, sourceCode, node);
+
 	return (
-		isMaxLength(arrowRoot, maxLength, sourceCode) ||
-		isMaxLength(returnValue, maxLength, sourceCode) ||
-		isMultiline(returnValue) ||
+		estimatedImplicitLength > maxLength ||
+		(isMultiline(returnValue) &&
+			returnValue.type !== AST_NODE_TYPES.ArrayExpression &&
+			returnValue.type !== AST_NODE_TYPES.ObjectExpression) ||
 		(Boolean(jsxAlwaysUseExplicitReturn) && isJsxElement(returnValue)) ||
 		(namedExportsAlwaysExplicit && isNamedExport(node.parent))
 	);
@@ -391,10 +569,21 @@ function shouldUseExplicitReturn(
 	const { jsxAlwaysUseExplicitReturn, maxLength, namedExportsAlwaysExplicit } =
 		getRuleOptions(context);
 
+	// Check if converting to single line would be too long
+	const wouldBeTooLong = isMaxLength(arrowRoot, maxLength, sourceCode);
+
+	// Use explicit return if:
+	// - There are comments that would be lost
+	// - Converting to single-line implicit would exceed max length
+	// - JSX should always use explicit (and this is JSX)
+	// - Named exports should always use explicit (and this is named export)
+	// - Body is multiline (any multiline body should use explicit return)
+	const isMultilineExpression = isMultiline(body);
+
 	return (
 		commentsExist ||
-		isMaxLength(arrowRoot, maxLength, sourceCode) ||
-		isMultiline(body) ||
+		wouldBeTooLong ||
+		isMultilineExpression ||
 		(Boolean(jsxAlwaysUseExplicitReturn) && isJsxElement(body)) ||
 		(namedExportsAlwaysExplicit && isNamedExport(parent))
 	);

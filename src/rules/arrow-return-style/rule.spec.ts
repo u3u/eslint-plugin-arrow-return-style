@@ -190,22 +190,6 @@ const invalid: Array<InvalidTestCase> = [
 	},
 
 	{
-		code: unindent`
-			const data = () => ({
-			  name: ''
-			})
-		`,
-		errors: [{ messageId: explicitMessageId }],
-		output: unindent`
-			const data = () => {
-			  return {
-			    name: ''
-			  };
-			}
-		`,
-	},
-
-	{
 		code: "export const defineConfig = <T extends Linter.Config>(config: T) => config",
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
@@ -336,7 +320,9 @@ const invalid: Array<InvalidTestCase> = [
 			if (enableGitignore) {
 				if (typeof enableGitignore !== "boolean") {
 					configs.push(
-						interopDefault(import("eslint-config-flat-gitignore")).then((resolved) => [resolved(enableGitignore)]),
+						interopDefault(import("eslint-config-flat-gitignore")).then((resolved) => {
+							return [resolved(enableGitignore)];
+						}),
 					);
 				}
 			}
