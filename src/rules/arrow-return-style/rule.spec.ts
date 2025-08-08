@@ -61,6 +61,18 @@ const valid: Array<ValidTestCase> = [
         temporary: (v: UDim, rem = 0) => new UDim(v.Scale, v.Offset * rem),
       };
     `,
+
+	unindent`
+		if (enableGitignore) {
+			if (typeof enableGitignore !== "boolean") {
+				configs.push(
+					interopDefault(import("eslint-config-flat-gitignore")).then((resolved) => {
+						return [resolved(enableGitignore)];
+					}),
+				);
+			}
+		}
+	`,
 ];
 
 const invalid: Array<InvalidTestCase> = [
@@ -70,7 +82,9 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
-			const UDimTemporary = (value: UDim, rem: number): UDim => { return new UDim(value.Scale, value.Offset * rem) };
+			const UDimTemporary = (value: UDim, rem: number): UDim => {
+				return new UDim(value.Scale, value.Offset * rem);
+			}
 		`,
 	},
 
@@ -84,8 +98,9 @@ const invalid: Array<InvalidTestCase> = [
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
 			const obj = {
-			  UDimTemporary11111111111: (value: UDim, rem: number): UDim =>
-			    { return new UDim(value.Scale, value.Offset * rem) },
+			  UDimTemporary11111111111: (value: UDim, rem: number): UDim => {
+				return new UDim(value.Scale, value.Offset * rem);
+			  }
 			};
 		`,
 	},
@@ -97,8 +112,9 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
-			const isVariableDeclaration = (node: TSESTree.Node | null | undefined): node is TSESTree.VariableDeclaration =>
-			  { return node?.type === AST_NODE_TYPES.VariableDeclaration };
+			const isVariableDeclaration = (node: TSESTree.Node | null | undefined): node is TSESTree.VariableDeclaration => {
+				return node?.type === AST_NODE_TYPES.VariableDeclaration;
+			}
 		`,
 	},
 
@@ -112,7 +128,9 @@ const invalid: Array<InvalidTestCase> = [
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
 			const returnValues = blockBody
-			  .filter((node): node is TSESTree.ReturnStatement => { return node.type === AST_NODE_TYPES.ReturnStatement })
+			  .filter((node): node is TSESTree.ReturnStatement => {
+				return node.type === AST_NODE_TYPES.ReturnStatement;
+			  })
 			  .map((node) => node.argument)
 			  .filter(Boolean);
 		`,
@@ -127,10 +145,11 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
-			const delay = () =>
-			  { return new Promise((resolve) => {
+			const delay = () => {
+			  return new Promise((resolve) => {
 			    setTimeout(resolve, 1000)
-			  }) }
+			  });
+			}
 		`,
 	},
 
@@ -142,8 +161,7 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: implicitMessageId }],
 		output: unindent`
-			const foo = () => 
-			  'foo'
+			const foo = () => 'foo'
 		`,
 	},
 
@@ -155,9 +173,7 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: implicitMessageId }],
 		output: unindent`
-			Array.from({ length: 10 }).map((_, i) => 
-			  i + 1
-			)
+			Array.from({ length: 10 }).map((_, i) => i + 1)
 		`,
 	},
 
@@ -169,8 +185,7 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: implicitMessageId }],
 		output: unindent`
-			const obj = () => 
-			  ({ name: '' })
+			const obj = () => ({ name: '' })
 		`,
 	},
 
@@ -182,30 +197,44 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
-			const data = () => { return {
-			  name: ''
-			} }
+			const data = () => {
+			  return {
+			    name: ''
+			  };
+			}
 		`,
 	},
 
 	{
 		code: "export const defineConfig = <T extends Linter.Config>(config: T) => config",
 		errors: [{ messageId: explicitMessageId }],
-		output: "export const defineConfig = <T extends Linter.Config>(config: T) => { return config }",
+		output: unindent`
+			export const defineConfig = <T extends Linter.Config>(config: T) => {
+				return config;
+			}
+		`,
 	},
 
 	{
 		code: "const Div = () => <><div /></>",
 		errors: [{ messageId: explicitMessageId }],
 		options: [{ jsxAlwaysUseExplicitReturn: true }],
-		output: "const Div = () => { return <><div /></> }",
+		output: unindent`
+			const Div = () => {
+				return <><div /></>;
+			}
+		`,
 	},
 
 	{
 		code: "export const Div = () => <><div /></>",
 		errors: [{ messageId: explicitMessageId }],
 		options: [{ namedExportsAlwaysUseExplicitReturn: true }],
-		output: "export const Div = () => { return <><div /></> }",
+		output: unindent`
+			export const Div = () => {
+				return <><div /></>;
+			}
+		`,
 	},
 
 	{
@@ -221,14 +250,15 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
-			const FC = () =>
-			  { return <Foo
-			  // d=""
-			  z
-			  // test={{}}
-			  data-ignore=""
-			  bar={[]}
-			/> }
+			const FC = () => {
+			  return <Foo
+			    // d=""
+			    z
+			    // test={{}}
+			    data-ignore=""
+			    bar={[]}
+			  />;
+			}
 		`,
 	},
 
@@ -241,7 +271,9 @@ const invalid: Array<InvalidTestCase> = [
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
 			export const createRule = ESLintUtils.RuleCreator(
-			  (rule) => { return \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\` }
+			  (rule) => {
+				return \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\`;
+			  }
 			)
 		`,
 	},
@@ -250,7 +282,11 @@ const invalid: Array<InvalidTestCase> = [
 		code: "const render = () => (<div />)",
 		errors: [{ messageId: explicitMessageId }],
 		options: [{ jsxAlwaysUseExplicitReturn: true }],
-		output: "const render = () => { return <div /> }",
+		output: unindent`
+			const render = () => {
+				return <div />;
+			}
+		`,
 	},
 
 	{
@@ -279,6 +315,30 @@ const invalid: Array<InvalidTestCase> = [
 			const test = () => {
 			  // line comment
 			  return { name: 'test' }
+			}
+		`,
+	},
+
+	{
+		code: unindent`
+			if (enableGitignore) {
+				if (typeof enableGitignore !== "boolean") {
+					configs.push(
+						interopDefault(import("eslint-config-flat-gitignore")).then((resolved) => [
+							resolved(enableGitignore),
+						]),
+					);
+				}
+			}
+		`,
+		errors: [{ messageId: implicitMessageId }],
+		output: unindent`
+			if (enableGitignore) {
+				if (typeof enableGitignore !== "boolean") {
+					configs.push(
+						interopDefault(import("eslint-config-flat-gitignore")).then((resolved) => [resolved(enableGitignore)]),
+					);
+				}
 			}
 		`,
 	},
