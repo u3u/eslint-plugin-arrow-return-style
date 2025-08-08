@@ -1,117 +1,133 @@
-# Enforce arrow function return style (`arrow-return-style/arrow-return-style`)
-
-⚠️ This rule _warns_ in the ✅ `recommended` config.
+# Enforce consistent arrow function return style based on length, multiline expressions, JSX usage, and export context
 
 🔧 This rule is automatically fixable by the
 [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
 
 <!-- end auto-generated rule header -->
 
-## Fail
+🔧 This rule is automatically fixable by the
+[`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
 
-```tsx
-/* eslint-disable arrow-return-style/arrow-return-style */
+## Rule details
 
-function delay () {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 1000);
-  })
-}
+Enforces consistent return style for arrow functions based on various factors
+like line length, multiline expressions, JSX usage, and export context. This
+rule helps maintain readable and consistent arrow function syntax across your
+codebase.
 
-function foo () {
-  return "foo";
-}
+The rule automatically switches between implicit and explicit returns based on:
 
-Array.from({ length: 10 }).map((_, index) =>
-  index + 1
-);
+1. **Line length** - Long expressions use explicit returns for readability
+2. **Multiline expressions** - Complex expressions use explicit returns with
+   proper formatting
+3. **JSX elements** - Optional explicit returns for JSX components
+4. **Named exports** - Consistent explicit returns for exported functions
+5. **Comments** - Proper comment placement with explicit returns
 
-export function defineConfig <T extends Linter.Config>(config: T) { return config }
+## Examples
 
-function data () {
-  return {
-  name: "",
-}
-}
+### Incorrect
 
-function Div () {
-  return <>
-    <div />
-  </>
-}
+```js
+// Too long for implicit return (exceeds maxLen)
+const longExpression = () => someVeryLongFunctionName() + anotherLongFunction() + moreCode();
 
-function func () { /* block comment */ return 1
-}
+// Multiline should use explicit return
+const multiline = () => {
+  someValue +
+  anotherValue
+};
 
-function object () {
-  return { name: "" };
-}
+// Named export should use explicit return (by default)
+export const getUser = () => ({ name: "admin" });
+
+// Comments between arrow and body need explicit return
+const commented = () => /* comment */ value;
 ```
 
-## Pass
+### Correct
 
-```tsx
-function delay () {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 1000);
-  });
-}
+```js
+// Long expressions use explicit return
+const longExpression = () => {
+  return someVeryLongFunctionName() + anotherLongFunction() + moreCode();
+};
 
-const foo = () => "foo";
+// Multiline with proper explicit return
+const multiline = () => {
+  return someValue +
+    anotherValue;
+};
 
-const object = () => ({ name: "" });
+// Named export with explicit return
+export const getUser = () => {
+  return { name: "admin" };
+};
 
-Array.from({ length: 10 }).map((_, index) => index + 1);
+// Short expressions can use implicit return
+const short = () => value;
 
-export function defineConfig <T extends Linter.Config>(config: T) {
-  return config;
-}
-
-function data () {
-  return {
-    name: "",
-  };
-}
-
-function Div () {
-  return (
-    <>
-      <div />
-    </>
-  );
-}
-
-function func () {
-  /* block comment */
-  return 1;
-}
+// Comments properly placed with explicit return
+const commented = () => {
+  /* comment */
+  return value;
+};
 ```
 
 ## Options
 
+This rule accepts an options object with the following properties:
+
 ### `maxLen`
 
-Type: `number`\
-Default: `80`
+**Type**: `number`  
+**Default**: `80`
 
-If the arrow function expression exceeds `maxLen` characters, it is forced to
-use explicit return.
+Maximum line length for implicit returns. Arrow functions exceeding this length
+will be forced to use explicit return syntax for better readability.
+
+```js
+// With maxLen: 50
+const short = () => value; // ✅ Implicit return (under limit)
+const long = () => { // ✅ Explicit return (over limit)
+  return someVeryLongFunctionNameThatExceedsTheLimit();
+};
+```
 
 ### `jsxAlwaysUseExplicitReturn`
 
-Type: `boolean`\
-Default: `false`
+**Type**: `boolean`  
+**Default**: `false`
 
-If set `true`, always use explicit return when return value is `JSXElement` or
-`JSXFragment`.
+When `true`, JSX elements and fragments always use explicit return syntax, even
+for simple cases.
+
+```jsx
+// With jsxAlwaysUseExplicitReturn: true
+const Component1 = () => <div>Hello</div>; // ❌ Should use explicit return
+const Component2 = () => { // ✅ Explicit return required
+  return <div>Hello</div>;
+};
+
+// With jsxAlwaysUseExplicitReturn: false (default)
+const Component3 = () => <div>Hello</div>; // ✅ Implicit return allowed
+```
 
 ### `namedExportsAlwaysUseExplicitReturn`
 
-Type: `boolean`\
-Default: `true`
+**Type**: `boolean`  
+**Default**: `true`
 
-By default, named exported arrow functions will always use explicit return to
-maintain consistency with regular functions because it is more intuitive and
-unified, and convenient for expansion.
+Forces named exported arrow functions to use explicit return syntax for
+consistency with regular function declarations and easier future expansion.
 
-See [#57](https://github.com/u3u/eslint-plugin-arrow-return-style/issues/57)
+```js
+// With namedExportsAlwaysUseExplicitReturn: true (default)
+export const getUser = () => ({ name: "admin" }); // ❌ Should use explicit return
+export const getUserCorrect = () => { // ✅ Explicit return required
+  return { name: "admin" };
+};
+
+// With namedExportsAlwaysUseExplicitReturn: false
+export const getProfile = () => ({ name: "admin" }); // ✅ Implicit return allowed
+```

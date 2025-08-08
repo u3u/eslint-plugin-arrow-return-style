@@ -33,10 +33,10 @@
 	},
 	"files": ["dist"],
 	"scripts": {
-		"build": "nr generate:types && tsdown --clean --dts",
+		"build": "tsdown --clean --dts",
 		"dev": "tsdown --stub",
 		"eslint-docs": "eslint-doc-generator",
-		"generate:types": "tsx scripts/generate-types.ts",
+		"posteslint-docs": "nr lint --cache --fix \"**/*.md\"",
 		"lint": "eslint --cache",
 		"prepare": "simple-git-hooks",
 		"prepublishOnly": "nr build",
@@ -46,11 +46,10 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"simple-git-hooks": {
-		"pre-commit": "npx lint-staged --concurrent false"
+		"pre-commit": "ni --frozen-lockfile --ignore-scripts --offline && npx lint-staged"
 	},
 	"lint-staged": {
-		"*.{js,cjs,mjs,jsx,ts,tsx,md}": ["eslint --fix"],
-		"*": ["prettier --write --ignore-unknown"]
+		"*": "eslint --fix"
 	},
 	"dependencies": {
 		"@typescript-eslint/type-utils": "catalog:cli",
@@ -58,11 +57,11 @@
 	},
 	"devDependencies": {
 		"@antfu/ni": "catalog:cli",
-		"@isentinel/eslint-config": "catalog:cli",
+		"@isentinel/eslint-config": "link:d:/roblox/personal/roblox-ts-eslint-config",
 		"@types/node": "catalog:types",
 		"@typescript-eslint/eslint-plugin": "catalog:cli",
 		"@typescript-eslint/parser": "catalog:cli",
-		"@vitest/eslint-plugin": "catalog:",
+		"@vitest/eslint-plugin": "catalog:testing",
 		"bumpp": "catalog:cli",
 		"eslint": "catalog:cli",
 		"eslint-doc-generator": "catalog:utils",
@@ -81,7 +80,7 @@
 		"vitest": "catalog:testing"
 	},
 	"peerDependencies": {
-		"eslint": ">=9.10.0"
+		"eslint": ">=9.15.0"
 	},
 	"packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748",
 	"engines": {

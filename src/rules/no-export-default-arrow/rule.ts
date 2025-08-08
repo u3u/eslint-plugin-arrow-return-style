@@ -1,105 +1,131 @@
-import { AST_NODE_TYPES, ASTUtils, type TSESTree } from "@typescript-eslint/utils";
+import { AST_NODE_TYPES, type TSESLint, type TSESTree } from "@typescript-eslint/utils";
 
 import path from "node:path";
-import { camelCase, pascalCase } from "scule";
 
-import { createRule } from "../utils/create-rule";
+import { createEslintRule } from "../../util";
+
+function toCamelCase(str: string): string {
+	return str
+		.replace(/[-_\s]+(.)?/g, (_, char: string) => (char ? char.toUpperCase() : ""))
+		.replace(/^[A-Z]/, (char) => char.toLowerCase());
+}
+
+function toPascalCase(str: string): string {
+	return str
+		.replace(/[-_\s]+(.)?/g, (_, char: string) => (char ? char.toUpperCase() : ""))
+		.replace(/^[a-z]/, (char) => char.toUpperCase());
+}
 
 export const RULE_NAME = "no-export-default-arrow";
 
-export const noExportDefaultArrowRule = createRule({
-	create: (context) => {
-		const sourceCode = context.getSourceCode();
-		let program: TSESTree.Program;
+const EXPORT_DEFAULT_ARROW_VIOLATION = "disallowExportDefaultArrow";
 
-		return {
-			ArrowFunctionExpression: (arrowFunction) => {
-				const { body: arrowBody, parent: arrowFunctionParent } = arrowFunction;
+const messages = {
+	[EXPORT_DEFAULT_ARROW_VIOLATION]: "Disallow export default anonymous arrow function",
+};
 
-				const isJsxElement = (node: TSESTree.Expression) => {
-					return (
-						node.type === AST_NODE_TYPES.JSXElement ||
-						node.type === AST_NODE_TYPES.JSXFragment
-					);
-				};
+function arrowReturnIsJsxElement(arrowBody: TSESTree.ArrowFunctionExpression["body"]): boolean {
+	const returnValues = getArrowReturnValues(arrowBody);
 
-				const getArrowReturnValues = () => {
-					if (arrowBody.type === AST_NODE_TYPES.BlockStatement) {
-						const blockBody = arrowBody.body;
+	return returnValues.some((node) => isJsxElement(node));
+}
 
-						return blockBody
-							.filter((node): node is TSESTree.ReturnStatement => {
-								return node.type === AST_NODE_TYPES.ReturnStatement;
-							})
-							.map((node) => node.argument)
-							.filter(Boolean);
-					}
+function create(context: Readonly<TSESLint.RuleContext<string, []>>): TSESLint.RuleListener {
+	const { sourceCode } = context;
 
-					return [arrowBody];
-				};
+	let program: TSESTree.Program;
 
-				const arrowReturnIsJsxElement = () => {
-					const returnValues = getArrowReturnValues();
+	return {
+		ArrowFunctionExpression: (arrowFunction) => {
+			const { parent: arrowFunctionParent } = arrowFunction;
 
-					return returnValues.some((node) => isJsxElement(node));
-				};
+			if (arrowFunctionParent.type === AST_NODE_TYPES.ExportDefaultDeclaration) {
+				context.report({
+					fix: createFixFunction({
+						arrowFunction,
+						arrowFunctionParent,
+						context,
+						program,
+						sourceCode,
+					}),
+					messageId: "disallowExportDefaultArrow",
+					node: arrowFunction,
+				});
+			}
+		},
+		Program: (node) => {
+			program = node;
+		},
+	};
+}
 
-				if (arrowFunctionParent.type === AST_NODE_TYPES.ExportDefaultDeclaration) {
-					context.report({
-						fix: (fixer) => {
-							const fixes = [];
-							const lastToken =
-								sourceCode.getLastToken(program, { includeComments: true }) ||
-								arrowFunctionParent;
-							const fileName =
-								context.getPhysicalFilename?.() ||
-								context.getFilename() ||
-								"namedFunction";
-							const { name: fileNameWithoutExtension } = path.parse(fileName);
+function createFixFunction(options: {
+	arrowFunction: TSESTree.ArrowFunctionExpression;
+	arrowFunctionParent: TSESTree.ExportDefaultDeclaration;
+	context: TSESLint.RuleContext<string, []>;
+	program: TSESTree.Program;
+	sourceCode: TSESLint.SourceCode;
+}) {
+	const { arrowFunction, arrowFunctionParent, context, program, sourceCode } = options;
 
-							const funcName = arrowReturnIsJsxElement()
-								? pascalCase(fileNameWithoutExtension)
-								: camelCase(fileNameWithoutExtension);
+	return (fixer: TSESLint.RuleFixer) => {
+		const fixes: Array<TSESLint.RuleFix> = [];
+		const lastToken =
+			sourceCode.getLastToken(program, { includeComments: true }) ?? arrowFunctionParent;
+		const fileName = context.physicalFilename || context.filename || "namedFunction";
+		const { name: fileNameWithoutExtension } = path.parse(fileName);
 
-							fixes.push(
-								fixer.replaceText(
-									arrowFunctionParent,
-									`const ${funcName} = ${sourceCode.getText(arrowFunction)}`,
-								),
-								fixer.insertTextAfter(lastToken, `\n\nexport default ${funcName}`),
-							);
+		const funcName = arrowReturnIsJsxElement(arrowFunction.body)
+			? toPascalCase(fileNameWithoutExtension)
+			: toCamelCase(fileNameWithoutExtension);
 
-							return fixes;
-						},
+		fixes.push(
+			fixer.replaceText(
+				arrowFunctionParent,
+				`const ${funcName} = ${sourceCode.getText(arrowFunction)}`,
+			),
+			fixer.insertTextAfter(lastToken, `\n\nexport default ${funcName}`),
+		);
 
-						messageId: "disallowExportDefaultArrow",
-						node: arrowFunction,
-					});
-				}
-			},
+		return fixes;
+	};
+}
 
-			Program: (node) => (program = node),
-		};
-	},
+function getArrowReturnValues(
+	arrowBody: TSESTree.ArrowFunctionExpression["body"],
+): Array<TSESTree.Expression> {
+	if (arrowBody.type === AST_NODE_TYPES.BlockStatement) {
+		const blockBody = arrowBody.body;
 
+		return blockBody
+			.filter((node): node is TSESTree.ReturnStatement => {
+				return node.type === AST_NODE_TYPES.ReturnStatement;
+			})
+			.map((node) => node.argument)
+			.filter((argument): argument is TSESTree.Expression => Boolean(argument));
+	}
+
+	return [arrowBody];
+}
+
+function isJsxElement(node: TSESTree.Expression): boolean {
+	return node.type === AST_NODE_TYPES.JSXElement || node.type === AST_NODE_TYPES.JSXFragment;
+}
+
+export const noExportDefaultArrowRule = createEslintRule({
+	create,
 	defaultOptions: [],
-
 	meta: {
 		docs: {
-			description:
-				"Disallow export default anonymous arrow function<br/>_**Automatically fix using the current file name.**_",
+			description: "Disallow anonymous arrow functions as export default declarations",
+			recommended: true,
+			requiresTypeChecking: true,
 		},
-
 		fixable: "code",
-
-		messages: {
-			disallowExportDefaultArrow: "Disallow export default anonymous arrow function",
-		},
-
+		hasSuggestions: false,
+		messages,
 		schema: [],
-
 		type: "suggestion",
 	},
-
 	name: RULE_NAME,
 });

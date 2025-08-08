@@ -1,183 +1,206 @@
-# eslint-plugin-arrow-return-style
+# eslint-plugin-arrow-return-style-x
 
 > Enforce arrow function return style and automatically fix it
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![codecov][codecov-src]][codecov-href] [![License][license-src]][license-href]
+[![License][license-src]][license-href]
+
+## Attribution
+
+This project is a fork of
+[`eslint-plugin-arrow-return-style`](https://github.com/u3u/eslint-plugin-arrow-return-style)
+by [u3u](https://github.com/u3u). The original work provides the foundation for
+arrow function return style enforcement, and this fork extends it with
+additional features and improvements.
 
 ## Features
 
-> This rule serves as an alternative to the
-> [`arrow-body-style`](https://eslint.org/docs/latest/rules/arrow-body-style#as-needed)
-> with `as-needed` options, used to improve the style of arrow function return
-> statement.
+This ESLint plugin provides intelligent arrow function return style enforcement,
+serving as an enhanced alternative to
+[`arrow-body-style`](https://eslint.org/docs/latest/rules/arrow-body-style#as-needed)
+with smarter heuristics.
 
-- When arrow function expressions are multiline or exceed a certain length,
-  explicit return should be enforced to improve readability and extensibility.
-- When an arrow function has only one return statement (and does not contain any
-  comments), implicit return should be used to simplify the code and improve
-  readability.
-- When using arrow functions as named exports, explicit return should always be
-  used to maintain consistency with regular functions.
-- When using arrow functions as React components, always use explicit return to
-  facilitate the addition of `props` and `hooks` in the future.
+### Key Benefits
 
-## Install
+- **Improved Readability**: Enforces explicit returns for multiline or lengthy
+  expressions while keeping simple cases concise
+- **Smart JSX Handling**: Optional explicit returns for JSX components to
+  facilitate future development
+- **Named Export Consistency**: Maintains consistency between arrow functions
+  and regular function declarations
+- **Automatic Fixes**: Both rules provide comprehensive auto-fixes for seamless
+  adoption
+- **Debug-Friendly Code**: Anonymous arrow function exports are converted to
+  named functions for better stack traces
 
-```sh
-pnpm add eslint-plugin-arrow-return-style -D
+## Installation
+
+```bash
+# npm
+npm install eslint-plugin-arrow-return-style-x --save-dev
+
+# pnpm
+pnpm add eslint-plugin-arrow-return-style-x -D
+
+# yarn
+yarn add eslint-plugin-arrow-return-style-x --dev
 ```
 
 ## Usage
 
+### Flat Config (ESLint 9+)
+
 ```js
-/** @type {import('eslint').Linter.Config} */
-module.exports = {
-  extends: ["plugin:arrow-return-style/recommended"],
-};
+import arrowReturnStyle from "eslint-plugin-arrow-return-style-x";
+
+export default [
+  {
+    plugins: {
+      "arrow-return-style-x": arrowReturnStyle,
+    },
+    rules: {
+      ...arrowReturnStyle.configs.recommended.rules,
+    },
+  },
+];
 ```
+
+### Legacy Config (.eslintrc)
+
+```json
+{
+	"extends": ["plugin:arrow-return-style-x/recommended"]
+}
+```
+
+## Configuration Options
+
+### `arrow-return-style`
+
+Configure the main rule with these options:
+
+```json
+{
+	"rules": {
+		"arrow-return-style-x/arrow-return-style": ["error", {
+			"maxLen": 80,
+			"jsxAlwaysUseExplicitReturn": false,
+			"namedExportsAlwaysUseExplicitReturn": true
+		}]
+	}
+}
+```
+
+#### Options
+
+- **`maxLen`** (default: `80`): Maximum line length before enforcing explicit
+  returns
+- **`jsxAlwaysUseExplicitReturn`** (default: `false`): Always use explicit
+  returns for JSX elements
+- **`namedExportsAlwaysUseExplicitReturn`** (default: `true`): Enforce explicit
+  returns for named exports
+
+### `no-export-default-arrow`
+
+This rule has no configuration options and automatically generates function
+names from filenames.
 
 ## Examples
 
-### Fail
+### `arrow-return-style` Rule
 
-```tsx
-/* eslint-disable arrow-return-style/arrow-return-style */
+#### ❌ Incorrect
 
-function delay () {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 1000);
-  })
-}
+```js
+// Too long for implicit return
+const longFunction = () => someVeryLongFunctionCall() + anotherLongCall() + moreCode();
 
-function foo () {
-  return "foo";
-}
+// Named export should use explicit return
+export const getUser = () => ({ name: "admin" });
 
-Array.from({ length: 10 }).map((_, index) =>
-  index + 1
-);
-
-export function defineConfig <T extends Linter.Config>(config: T) { return config }
-
-function data () {
-  return {
-  name: "",
-}
-}
-
-function Div () {
-  return <>
-    <div />
-  </>
-}
-
-function func () { /* block comment */ return 1
-}
-
-function object () {
-  return { name: "" };
-}
+// Comments between arrow and body
+const commented = () => /* comment */ value;
 ```
 
-### Pass
+#### ✅ Correct
 
-```tsx
-function delay () {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 1000);
-  });
-}
+```js
+// Long expressions use explicit return
+const longFunction = () => {
+  return someVeryLongFunctionCall() + anotherLongCall() + moreCode();
+};
 
-const foo = () => "foo";
+// Named export with explicit return
+export const getUser = () => {
+  return { name: "admin" };
+};
 
-const object = () => ({ name: "" });
-
-Array.from({ length: 10 }).map((_, index) => index + 1);
-
-export function defineConfig <T extends Linter.Config>(config: T) {
-  return config;
-}
-
-function data () {
-  return {
-    name: "",
-  };
-}
-
-function Div () {
-  return (
-    <>
-      <div />
-    </>
-  );
-}
-
-function func () {
-  /* block comment */
-  return 1;
-}
+// Short expressions can use implicit return
+const short = () => value;
 ```
 
-## Options
+### `no-export-default-arrow` Rule
 
-### `maxLen`
+#### ❌ Incorrect Usage
 
-Type: `number`\
-Default: `80`
+```js
+// File: useCounter.ts
+export default () => {
+  const [count, setCount] = useState(0);
+  return { count, setCount };
+};
+```
 
-If the arrow function expression exceeds `maxLen` characters, it is forced to
-use explicit return.
+#### ✅ Correct (Auto-fixed)
 
-### `jsxAlwaysUseExplicitReturn`
+```js
+// File: useCounter.ts
+const useCounter = () => {
+  const [count, setCount] = useState(0);
+  return { count, setCount };
+};
 
-Type: `boolean`\
-Default: `false`
+export default useCounter;
+```
 
-If set `true`, always use explicit return when return value is `JSXElement` or
-`JSXFragment`.
+## Rules Reference
 
-### `namedExportsAlwaysUseExplicitReturn`
-
-Type: `boolean`\
-Default: `true`
-
-By default, named exported arrow functions will always use explicit return to
-maintain consistency with regular functions because it is more intuitive and
-unified, and convenient for expansion.
-
-## Rules
-
-<!-- prettier-ignore-start -->
 <!-- begin auto-generated rules list -->
 
-⚠️ Configurations set to warn in.\
-✅ Set in the `recommended` configuration.\
-🔧 Automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/user-guide/command-line-interface#--fix).
+🔧 Automatically fixable by the
+[`--fix` CLI option](https://eslint.org/docs/user-guide/command-line-interface#--fix).\
+💭
+Requires [type information](https://typescript-eslint.io/linting/typed-linting).
 
-| Name                                                             | Description                                                                                               | ⚠️ | 🔧 |
-| :--------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------- | :- | :- |
-| [arrow-return-style](docs/rules/arrow-return-style.md)           | Enforce arrow function return style                                                                       | ✅  | 🔧 |
-| [no-export-default-arrow](docs/rules/no-export-default-arrow.md) | Disallow export default anonymous arrow function<br/>_**Automatically fix using the current file name.**_ | ✅  | 🔧 |
+| Name                                                                          | Description                                                                                                          | 🔧  | 💭  |
+| :---------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------- | :-- | :-- |
+| [arrow-return-style](src/rules/arrow-return-style/documentation.md)           | Enforce consistent arrow function return style based on length, multiline expressions, JSX usage, and export context | 🔧  |     |
+| [no-export-default-arrow](src/rules/no-export-default-arrow/documentation.md) | Disallow anonymous arrow functions as export default declarations                                                    | 🔧  | 💭  |
 
 <!-- end auto-generated rules list -->
-<!-- prettier-ignore-end -->
+
+## Contributing
+
+Contributions are welcome! Please see our
+[contributing guidelines](CONTRIBUTING.md) for details.
 
 ## License
 
-[MIT](./LICENSE) License © 2023 [u3u](https://github.com/u3u)
+[MIT](./LICENSE) License © 2024
+[Christopher Buss](https://github.com/christopher-buss)
+
+Original work © 2023 [u3u](https://github.com/u3u)
 
 <!-- Badges -->
 
-[npm-version-src]: https://img.shields.io/npm/v/eslint-plugin-arrow-return-style
-[npm-version-href]: https://npmjs.com/package/eslint-plugin-arrow-return-style
+[npm-version-src]:
+	https://img.shields.io/npm/v/eslint-plugin-arrow-return-style-x
+[npm-version-href]: https://npmjs.com/package/eslint-plugin-arrow-return-style-x
 [npm-downloads-src]:
-	https://img.shields.io/npm/dm/eslint-plugin-arrow-return-style
-[npm-downloads-href]: https://npmjs.com/package/eslint-plugin-arrow-return-style
-[codecov-src]:
-	https://codecov.io/gh/u3u/eslint-plugin-arrow-return-style/graph/badge.svg
-[codecov-href]: https://codecov.io/gh/u3u/eslint-plugin-arrow-return-style
+	https://img.shields.io/npm/dm/eslint-plugin-arrow-return-style-x
+[npm-downloads-href]:
+	https://npmjs.com/package/eslint-plugin-arrow-return-style-x
 [license-src]:
-	https://img.shields.io/github/license/u3u/eslint-plugin-arrow-return-style.svg
+	https://img.shields.io/github/license/christopher-buss/eslint-plugin-arrow-return-style-x.svg
 [license-href]: ./LICENSE
