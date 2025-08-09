@@ -22,8 +22,8 @@ const EXPLICIT_RETURN_VIOLATION = "use-explicit-return";
 type MessageIds = typeof EXPLICIT_RETURN_VIOLATION | typeof IMPLICIT_RETURN_VIOLATION;
 
 const messages = {
-	[EXPLICIT_RETURN_VIOLATION]: "Use implicit return for single-line arrow function bodies.",
-	[IMPLICIT_RETURN_VIOLATION]: "Use explicit return for multiline arrow function bodies.",
+	[EXPLICIT_RETURN_VIOLATION]: "Use explicit return for arrow function bodies.",
+	[IMPLICIT_RETURN_VIOLATION]: "Use implicit return for arrow function bodies.",
 };
 
 interface ExplicitReturnFixContext {
