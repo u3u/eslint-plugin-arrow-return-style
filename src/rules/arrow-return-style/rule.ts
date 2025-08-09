@@ -3,6 +3,7 @@ import { AST_NODE_TYPES, ASTUtils, type TSESLint, type TSESTree } from "@typescr
 import detectIndent from "detect-indent";
 
 import { createEslintRule } from "../../util";
+import { formatWithPrettier, isPrettierAvailable } from "../../utils/prettier-format";
 
 const indentCache = new WeakMap<TSESLint.SourceCode, string>();
 
@@ -11,6 +12,7 @@ type Options = [
 		jsxAlwaysUseExplicitReturn?: boolean;
 		maxLen?: number;
 		namedExportsAlwaysUseExplicitReturn?: boolean;
+		usePrettier?: boolean;
 	},
 ];
 
@@ -57,6 +59,64 @@ function adjustJsxIndentation(bodyText: string, indentUnit: string): string {
 	});
 
 	return adjustedLines.join("\n");
+}
+
+/**
+ * Builds the complete code for prettier formatting.
+ *
+ * @param returnValue - The return value expression.
+ * @param sourceCode - ESLint source code object.
+ * @param node - The arrow function node.
+ * @returns Complete code string for prettier formatting, or null if unable to
+ *   build.
+ */
+function buildPrettierCode(
+	returnValue: TSESTree.BlockStatement | TSESTree.Expression,
+	sourceCode: TSESLint.SourceCode,
+	node: TSESTree.ArrowFunctionExpression,
+): null | string {
+	const returnValueText = sourceCode.getText(returnValue);
+	const nodeText = sourceCode.getText(node);
+	const arrowIndex = nodeText.indexOf(" => ");
+
+	if (arrowIndex === -1) {
+		return null;
+	}
+
+	const parameters = nodeText.substring(0, arrowIndex);
+	let implicitReturnText = returnValueText;
+
+	if (isObjectLiteral(returnValue)) {
+		implicitReturnText = `(${returnValueText})`;
+	}
+
+	return `const temp = ${parameters} => ${implicitReturnText}`;
+}
+
+function calcPrettierImplicitLength(
+	returnValue: TSESTree.BlockStatement | TSESTree.Expression,
+	context: TSESLint.RuleContext<MessageIds, Options>,
+	node: TSESTree.ArrowFunctionExpression,
+): { isMultiline: boolean; length: number } {
+	const { sourceCode } = context;
+
+	const fullImplicitCode = buildPrettierCode(returnValue, sourceCode, node);
+	if (fullImplicitCode === null) {
+		return createPrettierFallbackResult(returnValue, sourceCode, node);
+	}
+
+	const prettierResult = formatWithPrettier(fullImplicitCode, context);
+	if (prettierResult.error !== undefined) {
+		return createPrettierFallbackResult(returnValue, sourceCode, node);
+	}
+
+	const prefixLength = "const temp = ".length;
+	const actualLength = Math.max(0, prettierResult.lineLength - prefixLength);
+
+	return {
+		isMultiline: prettierResult.isMultiline,
+		length: actualLength,
+	};
 }
 
 function calculateImplicitLength(
@@ -159,6 +219,25 @@ function createImplicitReturnFix(
 	};
 }
 
+/**
+ * Creates a fallback result when prettier formatting fails.
+ *
+ * @param returnValue - The return value expression.
+ * @param sourceCode - ESLint source code object.
+ * @param node - The arrow function node.
+ * @returns Object with multiline status and length information.
+ */
+function createPrettierFallbackResult(
+	returnValue: TSESTree.BlockStatement | TSESTree.Expression,
+	sourceCode: TSESLint.SourceCode,
+	node: TSESTree.ArrowFunctionExpression,
+): { isMultiline: boolean; length: number } {
+	return {
+		isMultiline: isMultiline(returnValue),
+		length: calculateImplicitLength(returnValue, sourceCode, node),
+	};
+}
+
 function determineReturnIndentation(
 	body: TSESTree.ArrowFunctionExpression["body"],
 	node: TSESTree.ArrowFunctionExpression,
@@ -237,6 +316,31 @@ function getExplicitReturnMessageId(body: TSESTree.ArrowFunctionExpression["body
 		: EXPLICIT_RETURN_VIOLATION;
 }
 
+function getImplicitReturnMetrics(
+	context: TSESLint.RuleContext<MessageIds, Options>,
+	node: TSESTree.ArrowFunctionExpression,
+	returnValue: TSESTree.BlockStatement | TSESTree.Expression,
+): { estimatedLength: number; wouldBeMultiline: boolean } {
+	const { sourceCode } = context;
+	const { usePrettier } = getRuleOptions(context);
+
+	if (usePrettier) {
+		const prettierResult = calcPrettierImplicitLength(returnValue, context, node);
+		return {
+			estimatedLength: prettierResult.length,
+			wouldBeMultiline: prettierResult.isMultiline,
+		};
+	}
+
+	const estimatedLength = calculateImplicitLength(returnValue, sourceCode, node);
+	const wouldBeMultiline =
+		isMultiline(returnValue) &&
+		returnValue.type !== AST_NODE_TYPES.ArrayExpression &&
+		returnValue.type !== AST_NODE_TYPES.ObjectExpression;
+
+	return { estimatedLength, wouldBeMultiline };
+}
+
 function getIndentStyle(sourceCode: TSESLint.SourceCode): string {
 	const cached = indentCache.get(sourceCode);
 	if (cached !== undefined) {
@@ -275,6 +379,7 @@ function getRuleOptions(context: TSESLint.RuleContext<MessageIds, Options>): {
 	jsxAlwaysUseExplicitReturn?: boolean;
 	maxLength: number;
 	namedExportsAlwaysExplicit: boolean;
+	usePrettier: boolean;
 } {
 	const [options] = context.options;
 
@@ -283,6 +388,7 @@ function getRuleOptions(context: TSESLint.RuleContext<MessageIds, Options>): {
 		jsxAlwaysUseExplicitReturn: options.jsxAlwaysUseExplicitReturn!,
 		maxLength: options.maxLen!,
 		namedExportsAlwaysExplicit: options.namedExportsAlwaysUseExplicitReturn!,
+		usePrettier: options.usePrettier ?? isPrettierAvailable(),
 		/* eslint-enable ts/no-non-null-assertion */
 	};
 }
@@ -489,18 +595,18 @@ function shouldSkipImplicitReturn(
 	node: TSESTree.ArrowFunctionExpression,
 	returnValue: TSESTree.Expression,
 ): boolean {
-	const { sourceCode } = context;
-
 	const { jsxAlwaysUseExplicitReturn, maxLength, namedExportsAlwaysExplicit } =
 		getRuleOptions(context);
 
-	const estimatedImplicitLength = calculateImplicitLength(returnValue, sourceCode, node);
+	const { estimatedLength, wouldBeMultiline } = getImplicitReturnMetrics(
+		context,
+		node,
+		returnValue,
+	);
 
 	return (
-		estimatedImplicitLength > maxLength ||
-		(isMultiline(returnValue) &&
-			returnValue.type !== AST_NODE_TYPES.ArrayExpression &&
-			returnValue.type !== AST_NODE_TYPES.ObjectExpression) ||
+		estimatedLength > maxLength ||
+		wouldBeMultiline ||
 		(Boolean(jsxAlwaysUseExplicitReturn) && isJsxElement(returnValue)) ||
 		(namedExportsAlwaysExplicit && isNamedExport(node.parent))
 	);
@@ -514,13 +620,11 @@ function shouldUseExplicitReturn(
 	const { body, parent } = node;
 
 	const commentsExist = commentsExistBetweenTokens(node, body, sourceCode);
-
 	const { jsxAlwaysUseExplicitReturn, maxLength, namedExportsAlwaysExplicit } =
 		getRuleOptions(context);
 
-	// Check if converting to single line would be too long
-	const estimatedImplicitLength = calculateImplicitLength(body, sourceCode, node);
-	const wouldBeTooLong = estimatedImplicitLength > maxLength;
+	const { estimatedLength, wouldBeMultiline } = getImplicitReturnMetrics(context, node, body);
+	const wouldBeTooLong = estimatedLength > maxLength;
 
 	// Use explicit return if:
 	// - There are comments that would be lost
@@ -531,7 +635,7 @@ function shouldUseExplicitReturn(
 	return (
 		commentsExist ||
 		wouldBeTooLong ||
-		isMultiline(body) ||
+		wouldBeMultiline ||
 		(Boolean(jsxAlwaysUseExplicitReturn) && isJsxElement(body)) ||
 		(namedExportsAlwaysExplicit && isNamedExport(parent))
 	);
@@ -557,6 +661,7 @@ const defaultOptions: Options = [
 		jsxAlwaysUseExplicitReturn: false,
 		maxLen: 80,
 		namedExportsAlwaysUseExplicitReturn: true,
+		usePrettier: false,
 	},
 ];
 
@@ -587,6 +692,11 @@ export const arrowReturnStyleRule = createEslintRule({
 					},
 					namedExportsAlwaysUseExplicitReturn: {
 						description: "Always use explicit return for named exports",
+						type: "boolean",
+					},
+					usePrettier: {
+						description:
+							"Use Prettier to determine actual formatted line length (auto-detects Prettier availability if not explicitly set)",
 						type: "boolean",
 					},
 				},
