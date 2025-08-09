@@ -1,10 +1,4 @@
-import {
-	AST_NODE_TYPES,
-	AST_TOKEN_TYPES,
-	ASTUtils,
-	type TSESLint,
-	type TSESTree,
-} from "@typescript-eslint/utils";
+import { AST_NODE_TYPES, ASTUtils, type TSESLint, type TSESTree } from "@typescript-eslint/utils";
 
 import detectIndent from "detect-indent";
 
@@ -66,7 +60,7 @@ function adjustJsxIndentation(bodyText: string, indentUnit: string): string {
 }
 
 function calculateImplicitLength(
-	returnValue: TSESTree.Expression,
+	returnValue: TSESTree.BlockStatement | TSESTree.Expression,
 	sourceCode: TSESLint.SourceCode,
 	node: TSESTree.ArrowFunctionExpression,
 ): number {
@@ -209,25 +203,12 @@ function generateReturnCommentFixes(
 	return fixes;
 }
 
-function getArrowRoot(
-	node: TSESTree.ArrowFunctionExpression,
-	parent: TSESTree.Node,
-): TSESTree.Node {
-	return isCallExpression(parent) ? node : (getArrowVariableDeclaration(parent) ?? parent);
-}
-
 function getArrowToken(
 	node: TSESTree.ArrowFunctionExpression,
 	sourceCode: TSESLint.SourceCode,
 ): TSESTree.Token | undefined {
 	const tokens = sourceCode.getTokens(node);
 	return tokens.find(ASTUtils.isArrowToken);
-}
-
-function getArrowVariableDeclaration(
-	node: TSESTree.Node,
-): TSESTree.VariableDeclaration | undefined {
-	return isVariableDeclaration(node.parent) ? node.parent : undefined;
 }
 
 function getBlockStatementTokens(
@@ -269,10 +250,6 @@ function getIndentStyle(sourceCode: TSESLint.SourceCode): string {
 	return indentStyle;
 }
 
-function getLength(node: TSESTree.Token, sourceCode: TSESLint.SourceCode): number {
-	return sourceCode.getText(node).length;
-}
-
 function getMethodChainIndentation(
 	node: TSESTree.ArrowFunctionExpression,
 	baseIndent: string,
@@ -308,21 +285,6 @@ function getRuleOptions(context: TSESLint.RuleContext<MessageIds, Options>): {
 		namedExportsAlwaysExplicit: options.namedExportsAlwaysUseExplicitReturn!,
 		/* eslint-enable ts/no-non-null-assertion */
 	};
-}
-
-function getTokensLength(node: TSESTree.Node, sourceCode: TSESLint.SourceCode): number {
-	const tokens = sourceCode.getTokens(node);
-
-	const implicitReturnTokens = tokens
-		.filter(ASTUtils.isNotOpeningBraceToken)
-		.filter((x) => x.type !== AST_TOKEN_TYPES.Keyword || x.value !== "return")
-		.filter(ASTUtils.isNotClosingBraceToken)
-		.filter(ASTUtils.isNotSemicolonToken);
-
-	return implicitReturnTokens.reduce(
-		(accumulator, token) => accumulator + getLength(token, sourceCode),
-		0,
-	);
 }
 
 function handleBlockStatement(
@@ -419,20 +381,8 @@ function hasCommentsInBlock(
 	);
 }
 
-function isCallExpression(node?: TSESTree.Node): node is TSESTree.CallExpression {
-	return node?.type === AST_NODE_TYPES.CallExpression;
-}
-
 function isJsxElement(node: TSESTree.Node): boolean {
 	return node.type === AST_NODE_TYPES.JSXElement || node.type === AST_NODE_TYPES.JSXFragment;
-}
-
-function isMaxLength(
-	node: TSESTree.Node,
-	maxLength: number,
-	sourceCode: TSESLint.SourceCode,
-): boolean {
-	return getTokensLength(node, sourceCode) > maxLength;
 }
 
 function isMultiline(node: TSESTree.NodeOrTokenData): boolean {
@@ -445,10 +395,6 @@ function isNamedExport(node: TSESTree.Node): boolean {
 
 function isObjectLiteral(node: TSESTree.Node): boolean {
 	return node.type === AST_NODE_TYPES.ObjectExpression;
-}
-
-function isVariableDeclaration(node?: TSESTree.Node): node is TSESTree.VariableDeclaration {
-	return node?.type === AST_NODE_TYPES.VariableDeclaration;
 }
 
 function normalizeParentheses(
@@ -548,13 +494,6 @@ function shouldSkipImplicitReturn(
 	const { jsxAlwaysUseExplicitReturn, maxLength, namedExportsAlwaysExplicit } =
 		getRuleOptions(context);
 
-	const arrowFunctionLine = sourceCode.lines[node.loc.start.line - 1];
-	const currentLineLength = arrowFunctionLine?.length ?? 0;
-
-	if (currentLineLength >= maxLength) {
-		return true;
-	}
-
 	const estimatedImplicitLength = calculateImplicitLength(returnValue, sourceCode, node);
 
 	return (
@@ -575,13 +514,13 @@ function shouldUseExplicitReturn(
 	const { body, parent } = node;
 
 	const commentsExist = commentsExistBetweenTokens(node, body, sourceCode);
-	const arrowRoot = getArrowRoot(node, parent);
 
 	const { jsxAlwaysUseExplicitReturn, maxLength, namedExportsAlwaysExplicit } =
 		getRuleOptions(context);
 
 	// Check if converting to single line would be too long
-	const wouldBeTooLong = isMaxLength(arrowRoot, maxLength, sourceCode);
+	const estimatedImplicitLength = calculateImplicitLength(body, sourceCode, node);
+	const wouldBeTooLong = estimatedImplicitLength > maxLength;
 
 	// Use explicit return if:
 	// - There are comments that would be lost

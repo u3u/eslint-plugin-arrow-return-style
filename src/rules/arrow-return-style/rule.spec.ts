@@ -76,6 +76,7 @@ const valid: Array<ValidTestCase> = [
 
 	"const 测试函数 = () => '短字符串'",
 	"const emojiFunc = () => '🚀'",
+	"const exactly80chars = () => 'this string makes the line exactly eighty chars:)'",
 ];
 
 const invalid: Array<InvalidTestCase> = [
@@ -368,6 +369,27 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: implicitMessageId }],
 		output: "const 한국어함수 = () => '안녕하세요 세계'",
+	},
+
+	// Test case to expose length calculation inconsistency
+	// Target the boundary between calculateImplicitLength vs isMaxLength vs line length
+	// This creates a scenario where different calculation methods might disagree
+	{
+		code: "const inconsistencyTest = () => { return obj.prop + other.value; }",
+		errors: [{ messageId: implicitMessageId }],
+		options: [{ maxLen: 65 }],
+		output: "const inconsistencyTest = () => obj.prop + other.value",
+	},
+
+	{
+		code: "const exactly81chars = () => 'this string makes the line exactly eighty-one char'",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ maxLen: 80 }],
+		output: unindent`
+			const exactly81chars = () => {
+				return 'this string makes the line exactly eighty-one char';
+			}
+		`,
 	},
 ];
 
