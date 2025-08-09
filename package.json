@@ -52,7 +52,8 @@
 	},
 	"dependencies": {
 		"@typescript-eslint/type-utils": "catalog:cli",
-		"@typescript-eslint/utils": "catalog:cli"
+		"@typescript-eslint/utils": "catalog:cli",
+		"detect-indent": "catalog:cli"
 	},
 	"devDependencies": {
 		"@antfu/ni": "catalog:cli",

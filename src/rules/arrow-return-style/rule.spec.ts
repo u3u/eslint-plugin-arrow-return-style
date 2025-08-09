@@ -99,7 +99,7 @@ const invalid: Array<InvalidTestCase> = [
 		output: unindent`
 			const obj = {
 			  UDimTemporary11111111111: (value: UDim, rem: number): UDim => {
-				return new UDim(value.Scale, value.Offset * rem);
+			    return new UDim(value.Scale, value.Offset * rem);
 			  }
 			};
 		`,
@@ -113,7 +113,7 @@ const invalid: Array<InvalidTestCase> = [
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
 			const isVariableDeclaration = (node: TSESTree.Node | null | undefined): node is TSESTree.VariableDeclaration => {
-				return node?.type === AST_NODE_TYPES.VariableDeclaration;
+			  return node?.type === AST_NODE_TYPES.VariableDeclaration;
 			}
 		`,
 	},
@@ -129,7 +129,7 @@ const invalid: Array<InvalidTestCase> = [
 		output: unindent`
 			const returnValues = blockBody
 			  .filter((node): node is TSESTree.ReturnStatement => {
-				return node.type === AST_NODE_TYPES.ReturnStatement;
+			    return node.type === AST_NODE_TYPES.ReturnStatement;
 			  })
 			  .map((node) => node.argument)
 			  .filter(Boolean);
@@ -256,7 +256,7 @@ const invalid: Array<InvalidTestCase> = [
 		output: unindent`
 			export const createRule = ESLintUtils.RuleCreator(
 			  (rule) => {
-				return \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\`;
+			    return \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\`;
 			  }
 			)
 		`,

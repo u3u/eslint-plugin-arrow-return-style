@@ -24,6 +24,9 @@ catalogs:
     bumpp:
       specifier: 10.2.2
       version: 10.2.2
+    detect-indent:
+      specifier: 7.0.1
+      version: 7.0.1
     eslint:
       specifier: 9.32.0
       version: 9.32.0
@@ -92,6 +95,9 @@ importers:
       '@typescript-eslint/utils':
         specifier: catalog:cli
         version: 8.39.0(eslint@9.32.0(jiti@2.5.1))(typescript@5.9.2)
+      detect-indent:
+        specifier: catalog:cli
+        version: 7.0.1
     devDependencies:
       '@antfu/ni':
         specifier: catalog:cli
@@ -984,6 +990,10 @@ packages:
 
   destr@2.0.5:
     resolution: {integrity: sha512-ugFTXCtDZunbzasqBxrK93Ik/DRYsO6S/fedkWEMKqt04xZ4csmnmwGDBAb07QWNaGMAmnTIemsYZCksjATwsA==}
+
+  detect-indent@7.0.1:
+    resolution: {integrity: sha512-Mc7QhQ8s+cLrnUfU/Ji94vG/r8M26m8f++vyres4ZoojaRDpZ1eSIh/EpzLNwlWuvzSZ3UbDFspjFvTDXe6e/g==}
+    engines: {node: '>=12.20'}
 
   diff-sequences@29.6.3:
     resolution: {integrity: sha512-EjePK1srD3P08o2j4f0ExnylqRs5B9tJjcp9t1krH2qRi8CCdsYfwe9JgSLurFBWwq4uOlipzfk5fHNvwFKr8Q==}
@@ -2617,6 +2627,8 @@ snapshots:
   defu@6.1.4: {}
 
   destr@2.0.5: {}
+
+  detect-indent@7.0.1: {}
 
   diff-sequences@29.6.3: {}
 
