@@ -73,6 +73,9 @@ const valid: Array<ValidTestCase> = [
 			}
 		}
 	`,
+
+	"const 测试函数 = () => '短字符串'",
+	"const emojiFunc = () => '🚀'",
 ];
 
 const invalid: Array<InvalidTestCase> = [
@@ -327,6 +330,44 @@ const invalid: Array<InvalidTestCase> = [
 				}
 			}
 		`,
+	},
+
+	// Unicode test cases - invalid (should trigger rule fixes)
+	{
+		code: "const longUnicode测试 = () => '这是一个很长的中文字符串测试，应该触发显式返回，因为它超过了最大长度限制了吧应该是这样的，还要更长一些才能确保触发规则'",
+		errors: [{ messageId: explicitMessageId }],
+		output: unindent`
+			const longUnicode测试 = () => {
+				return '这是一个很长的中文字符串测试，应该触发显式返回，因为它超过了最大长度限制了吧应该是这样的，还要更长一些才能确保触发规则';
+			}
+		`,
+	},
+	{
+		code: unindent`
+			const emojiLongFunction = () => {
+				return '🚀'.repeat(50);
+			}
+		`,
+		errors: [{ messageId: implicitMessageId }],
+		output: "const emojiLongFunction = () => '🚀'.repeat(50)",
+	},
+	{
+		code: unindent`
+			const unicodeBoundary = () => {
+				return "测试".repeat(10);
+			}
+		`,
+		errors: [{ messageId: implicitMessageId }],
+		output: 'const unicodeBoundary = () => "测试".repeat(10)',
+	},
+	{
+		code: unindent`
+			const 한국어함수 = () => {
+				return '안녕하세요 세계';
+			}
+		`,
+		errors: [{ messageId: implicitMessageId }],
+		output: "const 한국어함수 = () => '안녕하세요 세계'",
 	},
 ];
 

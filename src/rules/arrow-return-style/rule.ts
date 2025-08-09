@@ -269,8 +269,8 @@ function getIndentStyle(sourceCode: TSESLint.SourceCode): string {
 	return indentStyle;
 }
 
-function getLength(node: TSESTree.NodeOrTokenData): number {
-	return node.loc.end.column - node.loc.start.column;
+function getLength(node: TSESTree.Token, sourceCode: TSESLint.SourceCode): number {
+	return sourceCode.getText(node).length;
 }
 
 function getMethodChainIndentation(
@@ -319,7 +319,10 @@ function getTokensLength(node: TSESTree.Node, sourceCode: TSESLint.SourceCode): 
 		.filter(ASTUtils.isNotClosingBraceToken)
 		.filter(ASTUtils.isNotSemicolonToken);
 
-	return implicitReturnTokens.reduce((accumulator, token) => accumulator + getLength(token), 0);
+	return implicitReturnTokens.reduce(
+		(accumulator, token) => accumulator + getLength(token, sourceCode),
+		0,
+	);
 }
 
 function handleBlockStatement(
