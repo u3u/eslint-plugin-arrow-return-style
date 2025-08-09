@@ -3,7 +3,7 @@ import { AST_NODE_TYPES, ASTUtils, type TSESLint, type TSESTree } from "@typescr
 import detectIndent from "detect-indent";
 
 import { createEslintRule } from "../../util";
-import { formatWithPrettier } from "../../utils/prettier-format";
+import { formatWithPrettier, isPrettierAvailable } from "../../utils/prettier-format";
 
 const indentCache = new WeakMap<TSESLint.SourceCode, string>();
 
@@ -388,7 +388,7 @@ function getRuleOptions(context: TSESLint.RuleContext<MessageIds, Options>): {
 		jsxAlwaysUseExplicitReturn: options.jsxAlwaysUseExplicitReturn!,
 		maxLength: options.maxLen!,
 		namedExportsAlwaysExplicit: options.namedExportsAlwaysUseExplicitReturn!,
-		usePrettier: options.usePrettier ?? false,
+		usePrettier: options.usePrettier ?? isPrettierAvailable(),
 		/* eslint-enable ts/no-non-null-assertion */
 	};
 }
@@ -695,7 +695,8 @@ export const arrowReturnStyleRule = createEslintRule({
 						type: "boolean",
 					},
 					usePrettier: {
-						description: "Use Prettier to determine actual formatted line length",
+						description:
+							"Use Prettier to determine actual formatted line length (auto-detects Prettier availability if not explicitly set)",
 						type: "boolean",
 					},
 				},

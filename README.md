@@ -101,8 +101,9 @@ Configure the main rule with these options:
   returns for JSX elements
 - **`namedExportsAlwaysUseExplicitReturn`** (default: `true`): Enforce explicit
   returns for named exports
-- **`usePrettier`** (default: `false`): Use Prettier to determine actual
-  formatted line length instead of raw code length
+- **`usePrettier`** (default: auto-detect): Use Prettier to determine actual
+  formatted line length instead of raw code length. Automatically enables if
+  Prettier is installed and no explicit value is provided
 
 #### Prettier Integration
 
@@ -115,7 +116,8 @@ explicit vs implicit returns.
 1. Install Prettier as a peer dependency: `npm install prettier --save-dev`
 2. Configure Prettier in your project (`.prettierrc`, `prettier.config.js`,
    etc.)
-3. Enable the option: `"usePrettier": true`
+3. The option will automatically enable if Prettier is detected, or you can
+   explicitly set: `"usePrettier": true` or `"usePrettier": false`
 
 **Benefits:**
 
