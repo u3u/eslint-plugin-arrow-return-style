@@ -61,6 +61,22 @@ const valid: Array<ValidTestCase> = [
         temporary: (v: UDim, rem = 0) => new UDim(v.Scale, v.Offset * rem),
       };
     `,
+
+	unindent`
+		if (enableGitignore) {
+			if (typeof enableGitignore !== "boolean") {
+				configs.push(
+					interopDefault(import("eslint-config-flat-gitignore")).then((resolved) => {
+						return [resolved(enableGitignore)];
+					}),
+				);
+			}
+		}
+	`,
+
+	"const 测试函数 = () => '短字符串'",
+	"const emojiFunc = () => '🚀'",
+	"const exactly80chars = () => 'this string makes the line exactly eighty chars:)'",
 ];
 
 const invalid: Array<InvalidTestCase> = [
@@ -70,7 +86,9 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
-			const UDimTemporary = (value: UDim, rem: number): UDim => { return new UDim(value.Scale, value.Offset * rem) };
+			const UDimTemporary = (value: UDim, rem: number): UDim => {
+				return new UDim(value.Scale, value.Offset * rem);
+			}
 		`,
 	},
 
@@ -84,8 +102,9 @@ const invalid: Array<InvalidTestCase> = [
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
 			const obj = {
-			  UDimTemporary11111111111: (value: UDim, rem: number): UDim =>
-			    { return new UDim(value.Scale, value.Offset * rem) },
+			  UDimTemporary11111111111: (value: UDim, rem: number): UDim => {
+			    return new UDim(value.Scale, value.Offset * rem);
+			  }
 			};
 		`,
 	},
@@ -97,8 +116,9 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
-			const isVariableDeclaration = (node: TSESTree.Node | null | undefined): node is TSESTree.VariableDeclaration =>
-			  { return node?.type === AST_NODE_TYPES.VariableDeclaration };
+			const isVariableDeclaration = (node: TSESTree.Node | null | undefined): node is TSESTree.VariableDeclaration => {
+			  return node?.type === AST_NODE_TYPES.VariableDeclaration;
+			}
 		`,
 	},
 
@@ -112,7 +132,9 @@ const invalid: Array<InvalidTestCase> = [
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
 			const returnValues = blockBody
-			  .filter((node): node is TSESTree.ReturnStatement => { return node.type === AST_NODE_TYPES.ReturnStatement })
+			  .filter((node): node is TSESTree.ReturnStatement => {
+			    return node.type === AST_NODE_TYPES.ReturnStatement;
+			  })
 			  .map((node) => node.argument)
 			  .filter(Boolean);
 		`,
@@ -127,10 +149,11 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
-			const delay = () =>
-			  { return new Promise((resolve) => {
+			const delay = () => {
+			  return new Promise((resolve) => {
 			    setTimeout(resolve, 1000)
-			  }) }
+			  });
+			}
 		`,
 	},
 
@@ -142,8 +165,7 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: implicitMessageId }],
 		output: unindent`
-			const foo = () => 
-			  'foo'
+			const foo = () => 'foo'
 		`,
 	},
 
@@ -155,9 +177,7 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: implicitMessageId }],
 		output: unindent`
-			Array.from({ length: 10 }).map((_, i) => 
-			  i + 1
-			)
+			Array.from({ length: 10 }).map((_, i) => i + 1)
 		`,
 	},
 
@@ -169,43 +189,40 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: implicitMessageId }],
 		output: unindent`
-			const obj = () => 
-			  ({ name: '' })
-		`,
-	},
-
-	{
-		code: unindent`
-			const data = () => ({
-			  name: ''
-			})
-		`,
-		errors: [{ messageId: explicitMessageId }],
-		output: unindent`
-			const data = () => { return {
-			  name: ''
-			} }
+			const obj = () => ({ name: '' })
 		`,
 	},
 
 	{
 		code: "export const defineConfig = <T extends Linter.Config>(config: T) => config",
 		errors: [{ messageId: explicitMessageId }],
-		output: "export const defineConfig = <T extends Linter.Config>(config: T) => { return config }",
+		output: unindent`
+			export const defineConfig = <T extends Linter.Config>(config: T) => {
+				return config;
+			}
+		`,
 	},
 
 	{
 		code: "const Div = () => <><div /></>",
 		errors: [{ messageId: explicitMessageId }],
 		options: [{ jsxAlwaysUseExplicitReturn: true }],
-		output: "const Div = () => { return <><div /></> }",
+		output: unindent`
+			const Div = () => {
+				return <><div /></>;
+			}
+		`,
 	},
 
 	{
 		code: "export const Div = () => <><div /></>",
 		errors: [{ messageId: explicitMessageId }],
 		options: [{ namedExportsAlwaysUseExplicitReturn: true }],
-		output: "export const Div = () => { return <><div /></> }",
+		output: unindent`
+			export const Div = () => {
+				return <><div /></>;
+			}
+		`,
 	},
 
 	{
@@ -221,14 +238,15 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
-			const FC = () =>
-			  { return <Foo
-			  // d=""
-			  z
-			  // test={{}}
-			  data-ignore=""
-			  bar={[]}
-			/> }
+			const FC = () => {
+			  return <Foo
+			    // d=""
+			    z
+			    // test={{}}
+			    data-ignore=""
+			    bar={[]}
+			  />;
+			}
 		`,
 	},
 
@@ -241,7 +259,9 @@ const invalid: Array<InvalidTestCase> = [
 		errors: [{ messageId: explicitMessageId }],
 		output: unindent`
 			export const createRule = ESLintUtils.RuleCreator(
-			  (rule) => { return \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\` }
+			  (rule) => {
+			    return \`https://github.com/u3u/eslint-plugin-arrow-return-style/tree/v\${version}/docs/rules/\${rule}.md\`;
+			  }
 			)
 		`,
 	},
@@ -250,7 +270,11 @@ const invalid: Array<InvalidTestCase> = [
 		code: "const render = () => (<div />)",
 		errors: [{ messageId: explicitMessageId }],
 		options: [{ jsxAlwaysUseExplicitReturn: true }],
-		output: "const render = () => { return <div /> }",
+		output: unindent`
+			const render = () => {
+				return <div />;
+			}
+		`,
 	},
 
 	{
@@ -279,6 +303,91 @@ const invalid: Array<InvalidTestCase> = [
 			const test = () => {
 			  // line comment
 			  return { name: 'test' }
+			}
+		`,
+	},
+
+	{
+		code: unindent`
+			if (enableGitignore) {
+				if (typeof enableGitignore !== "boolean") {
+					configs.push(
+						interopDefault(import("eslint-config-flat-gitignore")).then((resolved) => [
+							resolved(enableGitignore),
+						]),
+					);
+				}
+			}
+		`,
+		errors: [{ messageId: implicitMessageId }],
+		output: unindent`
+			if (enableGitignore) {
+				if (typeof enableGitignore !== "boolean") {
+					configs.push(
+						interopDefault(import("eslint-config-flat-gitignore")).then((resolved) => {
+							return [resolved(enableGitignore)];
+						}),
+					);
+				}
+			}
+		`,
+	},
+
+	// Unicode test cases - invalid (should trigger rule fixes)
+	{
+		code: "const longUnicode测试 = () => '这是一个很长的中文字符串测试，应该触发显式返回，因为它超过了最大长度限制了吧应该是这样的，还要更长一些才能确保触发规则'",
+		errors: [{ messageId: explicitMessageId }],
+		output: unindent`
+			const longUnicode测试 = () => {
+				return '这是一个很长的中文字符串测试，应该触发显式返回，因为它超过了最大长度限制了吧应该是这样的，还要更长一些才能确保触发规则';
+			}
+		`,
+	},
+	{
+		code: unindent`
+			const emojiLongFunction = () => {
+				return '🚀'.repeat(50);
+			}
+		`,
+		errors: [{ messageId: implicitMessageId }],
+		output: "const emojiLongFunction = () => '🚀'.repeat(50)",
+	},
+	{
+		code: unindent`
+			const unicodeBoundary = () => {
+				return "测试".repeat(10);
+			}
+		`,
+		errors: [{ messageId: implicitMessageId }],
+		output: 'const unicodeBoundary = () => "测试".repeat(10)',
+	},
+	{
+		code: unindent`
+			const 한국어함수 = () => {
+				return '안녕하세요 세계';
+			}
+		`,
+		errors: [{ messageId: implicitMessageId }],
+		output: "const 한국어함수 = () => '안녕하세요 세계'",
+	},
+
+	// Test case to expose length calculation inconsistency
+	// Target the boundary between calculateImplicitLength vs isMaxLength vs line length
+	// This creates a scenario where different calculation methods might disagree
+	{
+		code: "const inconsistencyTest = () => { return obj.prop + other.value; }",
+		errors: [{ messageId: implicitMessageId }],
+		options: [{ maxLen: 65 }],
+		output: "const inconsistencyTest = () => obj.prop + other.value",
+	},
+
+	{
+		code: "const exactly81chars = () => 'this string makes the line exactly eighty-one char'",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ maxLen: 80 }],
+		output: unindent`
+			const exactly81chars = () => {
+				return 'this string makes the line exactly eighty-one char';
 			}
 		`,
 	},

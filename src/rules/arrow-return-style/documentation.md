@@ -5,9 +5,6 @@
 
 <!-- end auto-generated rule header -->
 
-🔧 This rule is automatically fixable by the
-[`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
-
 ## Rule details
 
 Enforces consistent return style for arrow functions based on various factors
