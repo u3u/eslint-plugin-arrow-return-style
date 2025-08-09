@@ -86,7 +86,8 @@ Configure the main rule with these options:
 		"arrow-return-style-x/arrow-return-style": ["error", {
 			"maxLen": 80,
 			"jsxAlwaysUseExplicitReturn": false,
-			"namedExportsAlwaysUseExplicitReturn": true
+			"namedExportsAlwaysUseExplicitReturn": true,
+			"usePrettier": false
 		}]
 	}
 }
@@ -100,6 +101,37 @@ Configure the main rule with these options:
   returns for JSX elements
 - **`namedExportsAlwaysUseExplicitReturn`** (default: `true`): Enforce explicit
   returns for named exports
+- **`usePrettier`** (default: `false`): Use Prettier to determine actual
+  formatted line length instead of raw code length
+
+#### Prettier Integration
+
+When `usePrettier` is enabled, the rule uses Prettier to format code before
+measuring line length, providing more accurate decisions about when to use
+explicit vs implicit returns.
+
+**Setup:**
+
+1. Install Prettier as a peer dependency: `npm install prettier --save-dev`
+2. Configure Prettier in your project (`.prettierrc`, `prettier.config.js`,
+   etc.)
+3. Enable the option: `"usePrettier": true`
+
+**Benefits:**
+
+- More accurate line length calculations based on actual formatted output
+- Consistent with your project's Prettier formatting rules
+- Reduces conflicts between ESLint fixes and Prettier formatting
+
+**Example:**
+
+```js
+// Without Prettier: This might be considered "long" due to spacing
+const object = () => ({  prop1   :   "val",   prop2   :   "val2"  });
+
+// With Prettier: Rule sees the formatted version and makes better decisions
+const object2 = () => ({ prop1: "val", prop2: "val2" }); // ✅ Implicit return OK
+```
 
 ### `no-export-default-arrow`
 

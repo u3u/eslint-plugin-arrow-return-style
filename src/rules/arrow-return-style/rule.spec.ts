@@ -77,6 +77,16 @@ const valid: Array<ValidTestCase> = [
 	"const 测试函数 = () => '短字符串'",
 	"const emojiFunc = () => '🚀'",
 	"const exactly80chars = () => 'this string makes the line exactly eighty chars:)'",
+
+	{
+		code: "const prettierMakesShort = () => ({ prop1: 'value', prop2: 'another' })",
+		options: [
+			{
+				maxLen: 60,
+				usePrettier: true,
+			},
+		],
+	},
 ];
 
 const invalid: Array<InvalidTestCase> = [
@@ -390,6 +400,23 @@ const invalid: Array<InvalidTestCase> = [
 				return 'this string makes the line exactly eighty-one char';
 			}
 		`,
+	},
+
+	// Test: Raw is long but Prettier makes it short enough for implicit
+	{
+		code: unindent`
+			const prettierMakesShortEnough = () => {
+				return {  prop1   :   'val',   prop2   :   'val2'  };
+			}
+		`,
+		errors: [{ messageId: implicitMessageId }],
+		options: [
+			{
+				maxLen: 60,
+				usePrettier: true,
+			},
+		],
+		output: "const prettierMakesShortEnough = () => ({  prop1   :   'val',   prop2   :   'val2'  })",
 	},
 ];
 

@@ -98,9 +98,10 @@ function getArrowReturnValues(
 		const blockBody = arrowBody.body;
 
 		return blockBody
-			.filter((node): node is TSESTree.ReturnStatement => {
-				return node.type === AST_NODE_TYPES.ReturnStatement;
-			})
+			.filter(
+				(node): node is TSESTree.ReturnStatement =>
+					node.type === AST_NODE_TYPES.ReturnStatement,
+			)
 			.map((node) => node.argument)
 			.filter((argument): argument is TSESTree.Expression => Boolean(argument));
 	}
