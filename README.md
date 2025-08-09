@@ -182,8 +182,7 @@ Requires [type information](https://typescript-eslint.io/linting/typed-linting).
 
 ## Contributing
 
-Contributions are welcome! Please see our
-[contributing guidelines](CONTRIBUTING.md) for details.
+Contributions are welcome!
 
 ## License
 
