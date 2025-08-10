@@ -5,6 +5,7 @@ import { arrowReturnStyleRule, RULE_NAME } from "./rule";
 
 const implicitMessageId = "use-implicit-return";
 const explicitMessageId = "use-explicit-return";
+const complexExplicitMessageId = "use-explicit-return-complex";
 
 const complexExplicitOption = "complex-explicit";
 
@@ -471,7 +472,7 @@ const invalid: Array<InvalidTestCase> = [
 
 	{
 		code: "const simpleObj = () => ({ player })",
-		errors: [{ messageId: explicitMessageId }],
+		errors: [{ messageId: complexExplicitMessageId }],
 		options: [{ objectReturnStyle: "always-explicit" }],
 		output: unindent`
 			const simpleObj = () => {
@@ -481,7 +482,7 @@ const invalid: Array<InvalidTestCase> = [
 	},
 	{
 		code: "const singleProp = () => ({ id: 1 })",
-		errors: [{ messageId: explicitMessageId }],
+		errors: [{ messageId: complexExplicitMessageId }],
 		options: [{ objectReturnStyle: "always-explicit" }],
 		output: unindent`
 			const singleProp = () => {
@@ -492,7 +493,7 @@ const invalid: Array<InvalidTestCase> = [
 
 	{
 		code: "const closePlayerData = (state, player: string) => ({ ...state, [player]: undefined })",
-		errors: [{ messageId: explicitMessageId }],
+		errors: [{ messageId: complexExplicitMessageId }],
 		options: [{ objectReturnStyle: complexExplicitOption }],
 		output: unindent`
 			const closePlayerData = (state, player: string) => {
@@ -502,7 +503,7 @@ const invalid: Array<InvalidTestCase> = [
 	},
 	{
 		code: "const threeProps = () => ({ player, test, another })",
-		errors: [{ messageId: explicitMessageId }],
+		errors: [{ messageId: complexExplicitMessageId }],
 		options: [{ maxObjectProperties: 2, objectReturnStyle: complexExplicitOption }],
 		output: unindent`
 			const threeProps = () => {
@@ -512,7 +513,7 @@ const invalid: Array<InvalidTestCase> = [
 	},
 	{
 		code: "const multipleCallsInObject = () => ({ name: getValue(), id: getId() })",
-		errors: [{ messageId: explicitMessageId }],
+		errors: [{ messageId: complexExplicitMessageId }],
 		options: [{ objectReturnStyle: complexExplicitOption }],
 		output: unindent`
 			const multipleCallsInObject = () => {
@@ -522,7 +523,7 @@ const invalid: Array<InvalidTestCase> = [
 	},
 	{
 		code: "const spreadPlusComputed = () => ({ ...state, [key]: value })",
-		errors: [{ messageId: explicitMessageId }],
+		errors: [{ messageId: complexExplicitMessageId }],
 		options: [{ objectReturnStyle: complexExplicitOption }],
 		output: unindent`
 			const spreadPlusComputed = () => {
@@ -532,7 +533,7 @@ const invalid: Array<InvalidTestCase> = [
 	},
 	{
 		code: "const computedPlusCall = () => ({ [key]: getValue() })",
-		errors: [{ messageId: explicitMessageId }],
+		errors: [{ messageId: complexExplicitMessageId }],
 		options: [{ objectReturnStyle: complexExplicitOption }],
 		output: unindent`
 			const computedPlusCall = () => {
@@ -543,7 +544,7 @@ const invalid: Array<InvalidTestCase> = [
 
 	{
 		code: "const complexArray = () => ([...items, newItem])",
-		errors: [{ messageId: explicitMessageId }],
+		errors: [{ messageId: complexExplicitMessageId }],
 		options: [{ objectReturnStyle: complexExplicitOption }],
 		output: unindent`
 			const complexArray = () => {
@@ -553,7 +554,7 @@ const invalid: Array<InvalidTestCase> = [
 	},
 	{
 		code: "const arrayWithCalls = () => ([getValue(), getId()])",
-		errors: [{ messageId: explicitMessageId }],
+		errors: [{ messageId: complexExplicitMessageId }],
 		options: [{ objectReturnStyle: complexExplicitOption }],
 		output: unindent`
 			const arrayWithCalls = () => {
