@@ -6,6 +6,8 @@ import { arrowReturnStyleRule, RULE_NAME } from "./rule";
 const implicitMessageId = "use-implicit-return";
 const explicitMessageId = "use-explicit-return";
 
+const complexExplicitOption = "complex-explicit";
+
 const valid: Array<ValidTestCase> = [
 	"const t = () => Date.now()",
 	"const fn = () => { return }",
@@ -86,6 +88,55 @@ const valid: Array<ValidTestCase> = [
 				usePrettier: true,
 			},
 		],
+	},
+
+	{
+		code: "const simpleObj = () => ({ player })",
+		options: [{ objectReturnStyle: "off" }],
+	},
+	{
+		code: "const simpleObj2 = () => ({ player })",
+		options: [{ objectReturnStyle: complexExplicitOption }],
+	},
+	{
+		code: "const twoProps = () => ({ player, id })",
+		options: [{ maxObjectProperties: 2, objectReturnStyle: complexExplicitOption }],
+	},
+	{
+		code: "const literalValues = () => ({ name: 'test', id: 1 })",
+		options: [{ objectReturnStyle: complexExplicitOption }],
+	},
+	{
+		code: "const simpleArray = () => ([1, 2, 3])",
+		options: [{ objectReturnStyle: complexExplicitOption }],
+	},
+	{
+		code: "const identifierArray = () => ([a, b, c])",
+		options: [{ objectReturnStyle: complexExplicitOption }],
+	},
+	{
+		code: "const manyElements = () => ([1, 2, 3, 4, 5, 6, 7])",
+		options: [{ maxObjectProperties: 2, objectReturnStyle: complexExplicitOption }],
+	},
+	{
+		code: "const manyIdentifiers = () => ([a, b, c, d, e, f])",
+		options: [{ maxObjectProperties: 2, objectReturnStyle: complexExplicitOption }],
+	},
+	{
+		code: "const singleSpread = () => ({ ...state })",
+		options: [{ objectReturnStyle: complexExplicitOption }],
+	},
+	{
+		code: "const singleArraySpread = () => ([...items])",
+		options: [{ objectReturnStyle: complexExplicitOption }],
+	},
+	{
+		code: "const singleComputedKey = () => ({ [key]: value })",
+		options: [{ objectReturnStyle: complexExplicitOption }],
+	},
+	{
+		code: "const singleFunctionCall = () => ({ name: getValue() })",
+		options: [{ objectReturnStyle: complexExplicitOption }],
 	},
 ];
 
@@ -402,7 +453,6 @@ const invalid: Array<InvalidTestCase> = [
 		`,
 	},
 
-	// Test: Raw is long but Prettier makes it short enough for implicit
 	{
 		code: unindent`
 			const prettierMakesShortEnough = () => {
@@ -417,6 +467,109 @@ const invalid: Array<InvalidTestCase> = [
 			},
 		],
 		output: "const prettierMakesShortEnough = () => ({  prop1   :   'val',   prop2   :   'val2'  })",
+	},
+
+	{
+		code: "const simpleObj = () => ({ player })",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ objectReturnStyle: "always-explicit" }],
+		output: unindent`
+			const simpleObj = () => {
+				return { player };
+			}
+		`,
+	},
+	{
+		code: "const singleProp = () => ({ id: 1 })",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ objectReturnStyle: "always-explicit" }],
+		output: unindent`
+			const singleProp = () => {
+				return { id: 1 };
+			}
+		`,
+	},
+
+	{
+		code: "const closePlayerData = (state, player: string) => ({ ...state, [player]: undefined })",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ objectReturnStyle: complexExplicitOption }],
+		output: unindent`
+			const closePlayerData = (state, player: string) => {
+				return { ...state, [player]: undefined };
+			}
+		`,
+	},
+	{
+		code: "const threeProps = () => ({ player, test, another })",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ maxObjectProperties: 2, objectReturnStyle: complexExplicitOption }],
+		output: unindent`
+			const threeProps = () => {
+				return { player, test, another };
+			}
+		`,
+	},
+	{
+		code: "const multipleCallsInObject = () => ({ name: getValue(), id: getId() })",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ objectReturnStyle: complexExplicitOption }],
+		output: unindent`
+			const multipleCallsInObject = () => {
+				return { name: getValue(), id: getId() };
+			}
+		`,
+	},
+	{
+		code: "const spreadPlusComputed = () => ({ ...state, [key]: value })",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ objectReturnStyle: complexExplicitOption }],
+		output: unindent`
+			const spreadPlusComputed = () => {
+				return { ...state, [key]: value };
+			}
+		`,
+	},
+	{
+		code: "const computedPlusCall = () => ({ [key]: getValue() })",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ objectReturnStyle: complexExplicitOption }],
+		output: unindent`
+			const computedPlusCall = () => {
+				return { [key]: getValue() };
+			}
+		`,
+	},
+
+	{
+		code: "const complexArray = () => ([...items, newItem])",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ objectReturnStyle: complexExplicitOption }],
+		output: unindent`
+			const complexArray = () => {
+				return [...items, newItem];
+			}
+		`,
+	},
+	{
+		code: "const arrayWithCalls = () => ([getValue(), getId()])",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ objectReturnStyle: complexExplicitOption }],
+		output: unindent`
+			const arrayWithCalls = () => {
+				return [getValue(), getId()];
+			}
+		`,
+	},
+	{
+		code: "const longArrayExceedsMaxLen = () => (['this', 'array', 'is', 'long'])",
+		errors: [{ messageId: explicitMessageId }],
+		options: [{ maxLen: 60, objectReturnStyle: complexExplicitOption }],
+		output: unindent`
+			const longArrayExceedsMaxLen = () => {
+				return ['this', 'array', 'is', 'long'];
+			}
+		`,
 	},
 ];
 
