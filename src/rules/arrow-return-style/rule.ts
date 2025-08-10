@@ -11,7 +11,9 @@ type Options = [
 	{
 		jsxAlwaysUseExplicitReturn?: boolean;
 		maxLen?: number;
+		maxObjectProperties?: number;
 		namedExportsAlwaysUseExplicitReturn?: boolean;
+		objectReturnStyle?: "always-explicit" | "complex-explicit" | "off";
 		usePrettier?: boolean;
 	},
 ];
@@ -660,7 +662,9 @@ const defaultOptions: Options = [
 	{
 		jsxAlwaysUseExplicitReturn: false,
 		maxLen: 80,
+		maxObjectProperties: 2,
 		namedExportsAlwaysUseExplicitReturn: true,
+		objectReturnStyle: "off",
 		usePrettier: false,
 	},
 ];
@@ -690,9 +694,21 @@ export const arrowReturnStyleRule = createEslintRule({
 						description: "Maximum line length before requiring explicit return",
 						type: "number",
 					},
+					maxObjectProperties: {
+						description:
+							"Maximum number of object properties before requiring explicit return (only applies when objectReturnStyle is 'complex-explicit')",
+						minimum: 1,
+						type: "number",
+					},
 					namedExportsAlwaysUseExplicitReturn: {
 						description: "Always use explicit return for named exports",
 						type: "boolean",
+					},
+					objectReturnStyle: {
+						description:
+							"Control when object and array returns should use explicit syntax",
+						enum: ["always-explicit", "complex-explicit", "off"],
+						type: "string",
 					},
 					usePrettier: {
 						description:
