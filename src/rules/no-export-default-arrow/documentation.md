@@ -28,8 +28,8 @@ The rule automatically fixes violations by:
 ```js
 // File: use-mouse.tsx
 export default () => {
-  const [position] = useState({ x: 0, y: 0 });
-  return position;
+	const [position] = useState({ x: 0, y: 0 });
+	return position;
 }; // ❌ Anonymous arrow function export
 ```
 
@@ -43,8 +43,8 @@ export default () => <div>Layout</div>; // ❌ Anonymous JSX component export
 ```js
 // File: use-mouse.tsx
 const useMouse = () => {
-  const [position] = useState({ x: 0, y: 0 });
-  return position;
+	const [position] = useState({ x: 0, y: 0 });
+	return position;
 };
 
 export default useMouse; // ✅ Named function export

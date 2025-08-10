@@ -29,12 +29,12 @@ The rule automatically switches between implicit and explicit returns based on:
 
 ```js
 // Too long for implicit return (exceeds maxLen)
-const longExpression = () => someVeryLongFunctionName() + anotherLongFunction() + moreCode();
+const longExpression = () =>
+	someVeryLongFunctionName() + anotherLongFunction() + moreCode();
 
 // Multiline should use explicit return
 const multiline = () => {
-  someValue +
-  anotherValue
+	someValue + anotherValue;
 };
 
 // Named export should use explicit return (by default)
@@ -45,8 +45,8 @@ const complexObject = () => ({ ...state, [player]: undefined });
 const manyProps = () => ({ email, id, name });
 
 // Complex arrays should use explicit return
-const complexArray = () => ([...items, item]);
-const arrayCalls = () => ([getValue(), getId()]);
+const complexArray = () => [...items, item];
+const arrayCalls = () => [getValue(), getId()];
 
 // Comments between arrow and body need explicit return
 const commented = () => /* comment */ value;
@@ -57,49 +57,48 @@ const commented = () => /* comment */ value;
 ```js
 // Long expressions use explicit return
 const longExpression = () => {
-  return someVeryLongFunctionName() + anotherLongFunction() + moreCode();
+	return someVeryLongFunctionName() + anotherLongFunction() + moreCode();
 };
 
 // Multiline with proper explicit return
 const multiline = () => {
-  return someValue +
-    anotherValue;
+	return someValue + anotherValue;
 };
 
 // Named export with explicit return
 export const getUser = () => {
-  return { name: "admin" };
+	return { name: "admin" };
 };
 
 // Complex objects with explicit return
 const complexObject = () => {
-  return { ...state, [player]: undefined };
+	return { ...state, [player]: undefined };
 };
 
 const manyProps = () => {
-  return { email, id, name };
+	return { email, id, name };
 };
 
 // Complex arrays with explicit return
 const complexArray = () => {
-  return [...items, item];
+	return [...items, item];
 };
 
 const arrayCalls = () => {
-  return [getValue(), getId()];
+	return [getValue(), getId()];
 };
 
 // Simple objects/arrays can use implicit return
 const simpleObject = () => ({ name: "test" });
-const simpleArray = () => ([1, 2, 3]);
+const simpleArray = () => [1, 2, 3];
 
 // Short expressions can use implicit return
 const short = () => value;
 
 // Comments properly placed with explicit return
 const commented = () => {
-  /* comment */
-  return value;
+	/* comment */
+	return value;
 };
 ```
 

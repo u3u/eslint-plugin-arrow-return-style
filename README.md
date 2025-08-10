@@ -54,9 +54,7 @@ yarn add eslint-plugin-arrow-return-style-x --dev
 ```js
 import arrowReturnStyle from "eslint-plugin-arrow-return-style-x";
 
-export default [
-  arrowReturnStyle.configs.recommended.rules
-];
+export default [arrowReturnStyle.configs.recommended.rules];
 ```
 
 ### Legacy Config (.eslintrc)
@@ -74,10 +72,13 @@ export default [
 ```json
 {
 	"rules": {
-		"arrow-return-style-x/arrow-return-style": ["error", {
-			"maxLen": 80,
-			"objectReturnStyle": "complex-explicit"
-		}]
+		"arrow-return-style-x/arrow-return-style": [
+			"error",
+			{
+				"maxLen": 80,
+				"objectReturnStyle": "complex-explicit"
+			}
+		]
 	}
 }
 ```
@@ -99,22 +100,23 @@ integration when available.
 
 ```js
 // ❌ Before: Inconsistent arrow function styles
-const longFunc = () => someVeryLongFunctionCall() + anotherLongCall() + moreCode();
+const longFunc = () =>
+	someVeryLongFunctionCall() + anotherLongCall() + moreCode();
 export const getUserBad = () => ({ name: "admin" });
 
 const complexFunc = () => ({ ...state, [key]: value });
 
 // ✅ After: Consistent, readable arrow functions
 const longFunc2 = () => {
-  return someVeryLongFunctionCall() + anotherLongCall() + moreCode();
+	return someVeryLongFunctionCall() + anotherLongCall() + moreCode();
 };
 
 export const getUserGood = () => {
-  return { name: "admin" };
+	return { name: "admin" };
 };
 
 const complexFunc2 = () => {
-  return { ...state, [key]: value };
+	return { ...state, [key]: value };
 };
 
 const simple = () => ({ name: "test" }); // Simple cases stay implicit
