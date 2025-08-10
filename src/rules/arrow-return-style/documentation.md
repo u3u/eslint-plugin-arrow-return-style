@@ -7,19 +7,21 @@
 
 ## Rule details
 
-Enforces consistent return style for arrow functions based on various factors
-like line length, multiline expressions, JSX usage, and export context. This
-rule helps maintain readable and consistent arrow function syntax across your
-codebase.
+Enforces consistent return style for arrow functions using context-aware
+decisions that consider line length, object complexity, JSX elements, and export
+context. This rule handles complex cases that other rules miss while maintaining
+zero conflicts with Prettier formatting.
 
 The rule automatically switches between implicit and explicit returns based on:
 
 1. **Line length** - Long expressions use explicit returns for readability
 2. **Multiline expressions** - Complex expressions use explicit returns with
    proper formatting
-3. **JSX elements** - Optional explicit returns for JSX components
-4. **Named exports** - Consistent explicit returns for exported functions
-5. **Comments** - Proper comment placement with explicit returns
+3. **Object/Array complexity** - Complex objects and arrays use explicit returns
+4. **JSX elements** - Optional explicit returns for JSX components
+5. **Named exports** - Forces explicit returns to maintain consistency with
+   regular functions
+6. **Comments** - Proper comment placement with explicit returns
 
 ## Examples
 
@@ -37,6 +39,14 @@ const multiline = () => {
 
 // Named export should use explicit return (by default)
 export const getUser = () => ({ name: "admin" });
+
+// Complex objects should use explicit return
+const complexObject = () => ({ ...state, [player]: undefined });
+const manyProps = () => ({ email, id, name });
+
+// Complex arrays should use explicit return
+const complexArray = () => ([...items, item]);
+const arrayCalls = () => ([getValue(), getId()]);
 
 // Comments between arrow and body need explicit return
 const commented = () => /* comment */ value;
@@ -61,6 +71,28 @@ export const getUser = () => {
   return { name: "admin" };
 };
 
+// Complex objects with explicit return
+const complexObject = () => {
+  return { ...state, [player]: undefined };
+};
+
+const manyProps = () => {
+  return { email, id, name };
+};
+
+// Complex arrays with explicit return
+const complexArray = () => {
+  return [...items, item];
+};
+
+const arrayCalls = () => {
+  return [getValue(), getId()];
+};
+
+// Simple objects/arrays can use implicit return
+const simpleObject = () => ({ name: "test" });
+const simpleArray = () => ([1, 2, 3]);
+
 // Short expressions can use implicit return
 const short = () => value;
 
@@ -73,58 +105,15 @@ const commented = () => {
 
 ## Options
 
-This rule accepts an options object with the following properties:
+<!-- begin auto-generated rule options list -->
 
-### `maxLen`
+| Name                                  | Description                                                                                                                      | Type    | Choices                                      |
+| :------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------- | :------ | :------------------------------------------- |
+| `jsxAlwaysUseExplicitReturn`          | Always use explicit return for JSX elements                                                                                      | Boolean |                                              |
+| `maxLen`                              | Maximum line length before requiring explicit return                                                                             | Number  |                                              |
+| `maxObjectProperties`                 | Maximum number of object properties before requiring explicit return (only applies when objectReturnStyle is 'complex-explicit') | Number  |                                              |
+| `namedExportsAlwaysUseExplicitReturn` | Always use explicit return for named exports                                                                                     | Boolean |                                              |
+| `objectReturnStyle`                   | Control when object and array returns should use explicit syntax                                                                 | String  | `always-explicit`, `complex-explicit`, `off` |
+| `usePrettier`                         | Use Prettier to determine actual formatted line length (auto-detects Prettier availability if not explicitly set)                | Boolean |                                              |
 
-**Type**: `number`  
-**Default**: `80`
-
-Maximum line length for implicit returns. Arrow functions exceeding this length
-will be forced to use explicit return syntax for better readability.
-
-```js
-// With maxLen: 50
-const short = () => value; // ✅ Implicit return (under limit)
-const long = () => { // ✅ Explicit return (over limit)
-  return someVeryLongFunctionNameThatExceedsTheLimit();
-};
-```
-
-### `jsxAlwaysUseExplicitReturn`
-
-**Type**: `boolean`  
-**Default**: `false`
-
-When `true`, JSX elements and fragments always use explicit return syntax, even
-for simple cases.
-
-```jsx
-// With jsxAlwaysUseExplicitReturn: true
-const Component1 = () => <div>Hello</div>; // ❌ Should use explicit return
-const Component2 = () => { // ✅ Explicit return required
-  return <div>Hello</div>;
-};
-
-// With jsxAlwaysUseExplicitReturn: false (default)
-const Component3 = () => <div>Hello</div>; // ✅ Implicit return allowed
-```
-
-### `namedExportsAlwaysUseExplicitReturn`
-
-**Type**: `boolean`  
-**Default**: `true`
-
-Forces named exported arrow functions to use explicit return syntax for
-consistency with regular function declarations and easier future expansion.
-
-```js
-// With namedExportsAlwaysUseExplicitReturn: true (default)
-export const getUser = () => ({ name: "admin" }); // ❌ Should use explicit return
-export const getUserCorrect = () => { // ✅ Explicit return required
-  return { name: "admin" };
-};
-
-// With namedExportsAlwaysUseExplicitReturn: false
-export const getProfile = () => ({ name: "admin" }); // ✅ Implicit return allowed
-```
+<!-- end auto-generated rule options list -->

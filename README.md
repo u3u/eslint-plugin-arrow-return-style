@@ -21,18 +21,18 @@ serving as an enhanced alternative to
 [`arrow-body-style`](https://eslint.org/docs/latest/rules/arrow-body-style#as-needed)
 with smarter heuristics.
 
-### Key Benefits
+### Key Features
 
-- **Improved Readability**: Enforces explicit returns for multiline or lengthy
-  expressions while keeping simple cases concise
-- **Smart JSX Handling**: Optional explicit returns for JSX components to
-  facilitate future development
-- **Named Export Consistency**: Maintains consistency between arrow functions
-  and regular function declarations
-- **Automatic Fixes**: Both rules provide comprehensive auto-fixes for seamless
-  adoption
-- **Debug-Friendly Code**: Anonymous arrow function exports are converted to
-  named functions for better stack traces
+- **Context-aware decisions**: Considers line length, object complexity, JSX
+  elements, and export context to determine the best return style
+- **Handles complex cases**: Works with objects, arrays, multiline expressions,
+  and named exports that other rules miss
+- **Auto-fixes everything**: No manual cleanup needed - the plugin fixes code
+  automatically
+- **Consistent exports**: Forces explicit returns for named exports to match
+  regular function style
+- **Prettier compatible**: Zero conflicts with Prettier formatting - works
+  seamlessly together
 
 ## Installation
 
@@ -55,14 +55,7 @@ yarn add eslint-plugin-arrow-return-style-x --dev
 import arrowReturnStyle from "eslint-plugin-arrow-return-style-x";
 
 export default [
-  {
-    plugins: {
-      "arrow-return-style-x": arrowReturnStyle,
-    },
-    rules: {
-      ...arrowReturnStyle.configs.recommended.rules,
-    },
-  },
+  arrowReturnStyle.configs.recommended.rules
 ];
 ```
 
@@ -74,129 +67,60 @@ export default [
 }
 ```
 
-## Configuration Options
+## Configuration
 
-### `arrow-return-style`
-
-Configure the main rule with these options:
+### Basic Setup
 
 ```json
 {
 	"rules": {
 		"arrow-return-style-x/arrow-return-style": ["error", {
 			"maxLen": 80,
-			"jsxAlwaysUseExplicitReturn": false,
-			"namedExportsAlwaysUseExplicitReturn": true,
-			"usePrettier": false
+			"objectReturnStyle": "complex-explicit"
 		}]
 	}
 }
 ```
 
-#### Options
+Key options include `maxLen` (line length limit), `objectReturnStyle`
+(object/array handling), JSX and named export controls, plus automatic Prettier
+integration when available.
 
-- **`maxLen`** (default: `80`): Maximum line length before enforcing explicit
-  returns
-- **`jsxAlwaysUseExplicitReturn`** (default: `false`): Always use explicit
-  returns for JSX elements
-- **`namedExportsAlwaysUseExplicitReturn`** (default: `true`): Enforce explicit
-  returns for named exports
-- **`usePrettier`** (default: auto-detect): Use Prettier to determine actual
-  formatted line length instead of raw code length. Automatically enables if
-  Prettier is installed and no explicit value is provided
+📖
+**[See full configuration options →](src/rules/arrow-return-style/documentation.md)**
 
-#### Prettier Integration
+### Rules Overview
 
-When `usePrettier` is enabled, the rule uses Prettier to format code before
-measuring line length, providing more accurate decisions about when to use
-explicit vs implicit returns.
+- **`arrow-return-style`**: Main rule with extensive configuration options
+- **`no-export-default-arrow`**: Converts anonymous exports to named functions
+  (no configuration needed)
 
-**Setup:**
-
-1. Install Prettier as a peer dependency: `npm install prettier --save-dev`
-2. Configure Prettier in your project (`.prettierrc`, `prettier.config.js`,
-   etc.)
-3. The option will automatically enable if Prettier is detected, or you can
-   explicitly set: `"usePrettier": true` or `"usePrettier": false`
-
-**Benefits:**
-
-- More accurate line length calculations based on actual formatted output
-- Consistent with your project's Prettier formatting rules
-- Reduces conflicts between ESLint fixes and Prettier formatting
-
-**Example:**
+## Quick Example
 
 ```js
-// Without Prettier: This might be considered "long" due to spacing
-const object = () => ({  prop1   :   "val",   prop2   :   "val2"  });
+// ❌ Before: Inconsistent arrow function styles
+const longFunc = () => someVeryLongFunctionCall() + anotherLongCall() + moreCode();
+export const getUserBad = () => ({ name: "admin" });
 
-// With Prettier: Rule sees the formatted version and makes better decisions
-const object2 = () => ({ prop1: "val", prop2: "val2" }); // ✅ Implicit return OK
-```
+const complexFunc = () => ({ ...state, [key]: value });
 
-### `no-export-default-arrow`
-
-This rule has no configuration options and automatically generates function
-names from filenames.
-
-## Examples
-
-### `arrow-return-style` Rule
-
-#### ❌ Incorrect
-
-```js
-// Too long for implicit return
-const longFunction = () => someVeryLongFunctionCall() + anotherLongCall() + moreCode();
-
-// Named export should use explicit return
-export const getUser = () => ({ name: "admin" });
-
-// Comments between arrow and body
-const commented = () => /* comment */ value;
-```
-
-#### ✅ Correct
-
-```js
-// Long expressions use explicit return
-const longFunction = () => {
+// ✅ After: Consistent, readable arrow functions
+const longFunc2 = () => {
   return someVeryLongFunctionCall() + anotherLongCall() + moreCode();
 };
 
-// Named export with explicit return
-export const getUser = () => {
+export const getUserGood = () => {
   return { name: "admin" };
 };
 
-// Short expressions can use implicit return
-const short = () => value;
-```
-
-### `no-export-default-arrow` Rule
-
-#### ❌ Incorrect Usage
-
-```js
-// File: useCounter.ts
-export default () => {
-  const [count, setCount] = useState(0);
-  return { count, setCount };
-};
-```
-
-#### ✅ Correct (Auto-fixed)
-
-```js
-// File: useCounter.ts
-const useCounter = () => {
-  const [count, setCount] = useState(0);
-  return { count, setCount };
+const complexFunc2 = () => {
+  return { ...state, [key]: value };
 };
 
-export default useCounter;
+const simple = () => ({ name: "test" }); // Simple cases stay implicit
 ```
+
+📖 **[See more examples →](src/rules/arrow-return-style/documentation.md)**
 
 ## Rules Reference
 
