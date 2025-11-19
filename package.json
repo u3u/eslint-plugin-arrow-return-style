@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
-    "@tsconfig/node20": "^20.1.7",
+    "@tsconfig/node20": "^20.1.8",
     "@types/node": "^20.19.25",
     "@typescript-eslint/rule-tester": "^7.18.0",
     "@u3u/eslint-config": "^2.15.2",

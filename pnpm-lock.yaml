@@ -19,8 +19,8 @@ importers:
         specifier: ^0.6.1
         version: 0.6.1
       '@tsconfig/node20':
-        specifier: ^20.1.7
-        version: 20.1.7
+        specifier: ^20.1.8
+        version: 20.1.8
       '@types/node':
         specifier: ^20.19.25
         version: 20.19.25
@@ -787,8 +787,8 @@ packages:
   '@total-typescript/ts-reset@0.6.1':
     resolution: {integrity: sha512-cka47fVSo6lfQDIATYqb/vO1nvFfbPw7uWLayIXIhGETj0wcOOlrlkobOMDNQOFr9QOafegUPq13V2+6vtD7yg==}
 
-  '@tsconfig/node20@20.1.7':
-    resolution: {integrity: sha512-Lt137u6AoCCJNNklpNtfGIYFEywma7Hd3B083jqMga37opSEVw7beWsD4OTXyzKS0I3G2kbQJVoZpOxy9GnxBQ==}
+  '@tsconfig/node20@20.1.8':
+    resolution: {integrity: sha512-Em+IdPfByIzWRRpqWL4Z7ArLHZGxmc36BxE3jCz9nBFSm+5aLaPMZyjwu4yetvyKXeogWcxik4L1jB5JTWfw7A==}
 
   '@types/acorn@4.0.6':
     resolution: {integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==}
@@ -4489,7 +4489,7 @@ snapshots:
 
   '@total-typescript/ts-reset@0.6.1': {}
 
-  '@tsconfig/node20@20.1.7': {}
+  '@tsconfig/node20@20.1.8': {}
 
   '@types/acorn@4.0.6':
     dependencies:
